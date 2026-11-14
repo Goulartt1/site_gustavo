@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps do projeto
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -86,6 +88,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
 }
+
+
+# Modelo de usuário do projeto (accounts.User) no lugar do padrão (auth.User).
+# Precisa estar definido antes do primeiro migrate.
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Password validation
