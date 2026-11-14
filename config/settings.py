@@ -110,9 +110,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+# Fuso usado para exibir datas e horas. Com USE_TZ = True, o banco guarda
+# tudo em UTC e o Django converte para este fuso na hora de mostrar.
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
