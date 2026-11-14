@@ -14,6 +14,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "pytest>=9.2.0",
+    "pytest-django>=4.14.0",
     "ruff>=0.17.5",
 ]
 
@@ -32,3 +34,9 @@ extend-exclude = ["*/migrations/*"]
 # UP   pyupgrade: troca sintaxe antiga pela do Python 3.13
 # DJ   flake8-django: boas práticas específicas do Django
 select = ["E", "W", "F", "I", "B", "UP", "DJ"]
+
+[tool.pytest.ini_options]
+# Diz ao pytest-django qual settings usar.
+DJANGO_SETTINGS_MODULE = "config.settings"
+# Arquivos onde o pytest procura testes.
+python_files = ["tests.py", "test_*.py"]
