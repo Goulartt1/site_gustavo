@@ -12,20 +12,29 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Variáveis de ambiente
+# Os valores vêm do ambiente do sistema ou do arquivo .env (fora do git).
+# O .env.example lista as variáveis esperadas.
+# Uma variável que já existe no ambiente do sistema vale mais que a do .env:
+# em produção, a hospedagem define as variáveis e não há .env.
+env = environ.Env(
+    # Padrão seguro: se DEBUG não for definido, fica desligado.
+    DEBUG=(bool, False),
+)
+environ.Env.read_env(BASE_DIR / '.env')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=vzk32-xqb_*r+6wqhg4o7_uqdxpswqwz)kjqpeum7e!q&zjve'
+# Sem valor padrão de propósito: se faltar, o Django não sobe e avisa.
+SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -37,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps do projeto
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -72,12 +83,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# O banco é definido por uma única URL (DATABASE_URL).
+# Sem a variável, usa o SQLite em db.sqlite3 na pasta do projeto.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
 }
+
+
+# Modelo de usuário do projeto (accounts.User) no lugar do padrão (auth.User).
+# Precisa estar definido antes do primeiro migrate.
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Password validation
@@ -102,9 +117,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+# Fuso usado para exibir datas e horas. Com USE_TZ = True, o banco guarda
+# tudo em UTC e o Django converte para este fuso na hora de mostrar.
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

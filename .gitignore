@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Variáveis de ambiente (contém segredos)
+.env
+
+# Banco SQLite local de desenvolvimento
+db.sqlite3
