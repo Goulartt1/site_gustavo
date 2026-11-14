@@ -11,3 +11,24 @@ dependencies = [
     "django>=5.2,<5.3",
     "django-environ>=0.14.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+# Migrações são geradas pelo Django: não vale a pena lintar nem formatar.
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+# Conjuntos de regras ativados (o padrão do ruff é só E e F):
+# E/W  pycodestyle: estilo básico (espaços, indentação)
+# F    pyflakes: erros prováveis (import não usado, variável indefinida)
+# I    isort: ordem dos imports
+# B    bugbear: armadilhas comuns do Python
+# UP   pyupgrade: troca sintaxe antiga pela do Python 3.13
+# DJ   flake8-django: boas práticas específicas do Django
+select = ["E", "W", "F", "I", "B", "UP", "DJ"]
