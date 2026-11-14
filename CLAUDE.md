@@ -36,6 +36,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 ## Convenções
 - Código (modelos, variáveis, funções) em inglês.
 - Textos da interface, documentação e mensagens de commit em português.
+- Commits e títulos de pull request no padrão Conventional Commits: `tipo(escopo): descrição` (ex.: `feat(accounts): cria modelo de usuário próprio`).
 
 ## Funções
 ### Visitante
