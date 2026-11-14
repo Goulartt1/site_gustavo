@@ -1,0 +1,43 @@
+# Integração contínua: roda lint, formatação e testes em uma máquina Linux
+# do GitHub a cada pull request e a cada push na main.
+name: CI
+
+on:
+  # Pull requests (qualquer branch de origem) e pushes na main (depois do merge).
+  # Push em branches de PR não está aqui para não rodar tudo duas vezes.
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  qualidade:
+    name: Lint, formatação e testes
+    runs-on: ubuntu-latest
+
+    env:
+      # Valores só para o CI: esta máquina roda testes e é descartada no fim,
+      # então a chave não precisa ser secreta (não é a de produção).
+      SECRET_KEY: chave-falsa-usada-apenas-no-ci
+      DEBUG: "False"
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar o uv
+        uses: astral-sh/setup-uv@v6
+
+      # --locked: falha se o uv.lock estiver desatualizado em relação ao
+      # pyproject.toml (ex.: alguém editou dependências e esqueceu o lock).
+      # O uv instala o Python indicado em .python-version.
+      - name: Instalar dependências
+        run: uv sync --locked
+
+      - name: Lint (ruff check)
+        run: uv run ruff check .
+
+      - name: Formatação (ruff format --check)
+        run: uv run ruff format --check .
+
+      - name: Testes (pytest)
+        run: uv run pytest

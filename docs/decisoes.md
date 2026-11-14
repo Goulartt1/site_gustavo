@@ -70,3 +70,72 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *`USE_TZ = False` com hora local.* Mais simples de ler direto no banco, mas horários ficam ambíguos em mudanças de fuso e comparações ficam frágeis. A própria documentação do Django desaconselha em projetos novos.
 
 **Custo.** Ao consultar o banco direto (ex.: no `psql`), os horários aparecem em UTC (3 horas à frente de Brasília). No código, usar `django.utils.timezone.now()` em vez de `datetime.now()`.
+
+---
+
+## 5. ruff para lint e formatação
+
+**Etapa:** 2 (Rede de segurança) · **Data:** 2026-11-14
+
+**Contexto.** Sem ferramenta, problemas simples (import esquecido, variável não usada) só aparecem quando alguém percebe, e cada pessoa formata o código de um jeito, o que gera discussão de estilo em revisão.
+
+**Decisão.** **ruff**, como dependência de desenvolvimento, configurado no `pyproject.toml`: linha de 100 caracteres, Python 3.13, migrações excluídas e as regras E, W, F, I, B, UP e DJ. `ruff check` aponta problemas; `ruff format` padroniza o visual (aspas duplas, espaços, quebras de linha).
+
+**Alternativas.**
+- *flake8 + black + isort.* A combinação clássica. Faz o mesmo com três ferramentas e três configurações, e é bem mais lenta.
+- *pylint.* Mais regras e mais profundo, mas lento, barulhento por padrão e sem formatação.
+- *Sem ferramenta.* Zero configuração, mas o padrão depende de disciplina e de revisão manual.
+
+**Custo.** A primeira formatação mexeu em quase todo o código (ficou em commit separado, tipo `style`). Algumas regras podem ser chatas em casos específicos; quando isso acontecer, desligar a regra de forma pontual e explicada (`# noqa: CÓDIGO`).
+
+---
+
+## 6. pytest e pytest-django para testes
+
+**Etapa:** 2 (Rede de segurança) · **Data:** 2026-11-14
+
+**Contexto.** O Django traz um executor de testes baseado em `unittest` (classes `TestCase`, `self.assertEqual`). Funciona, mas o mercado Python usa majoritariamente o pytest.
+
+**Decisão.** **pytest + pytest-django**, como dependências de desenvolvimento. Testes escritos como funções com `assert`; os que usam o banco levam `@pytest.mark.django_db`. Fixtures do pytest-django (`client`, `admin_client`) para simular requisições. Os testes ficam em `tests.py` dentro de cada app.
+
+**Alternativas.**
+- *Executor do Django (`manage.py test`).* Sem dependência nova, mas mais verboso e com saída de erro menos clara. O pytest roda os testes nesse estilo sem mudança, então a troca era barata.
+- *Pasta `tests/` por app em vez de `tests.py`.* Melhor quando há muitos testes. Fica para quando um app tiver testes suficientes para justificar.
+
+**Custo.** Duas dependências de desenvolvimento. É preciso lembrar da marca `django_db`: sem ela, o pytest-django bloqueia o acesso ao banco e o teste falha com uma mensagem explicando isso.
+
+---
+
+## 7. CI com GitHub Actions
+
+**Etapa:** 2 (Rede de segurança) · **Data:** 2026-11-14
+
+**Contexto.** Rodar lint e testes dependia de lembrar. Um erro podia chegar à `main` sem ninguém perceber.
+
+**Decisão.** Workflow `.github/workflows/ci.yml` que, numa máquina Ubuntu, roda `uv sync --locked`, `ruff check`, `ruff format --check` e `pytest`.
+- Dispara em todo pull request e em todo push na `main`. Push em branch de PR não dispara, para não rodar tudo duas vezes.
+- `uv sync --locked` falha se o `uv.lock` estiver desatualizado em relação ao `pyproject.toml`.
+- A `SECRET_KEY` do CI é um valor fixo escrito no workflow: a máquina só roda testes e é descartada, então não há o que proteger.
+
+**Alternativas.**
+- *GitLab CI, CircleCI e outros.* Equivalentes, mas exigiriam integrar outro serviço; o repositório já está no GitHub.
+- *Chave do CI nos secrets do GitHub.* Necessário para segredos reais (ex.: credenciais de deploy). Para uma chave de teste descartável, só esconderia um valor que não precisa ser escondido.
+- *pre-commit (rodar o ruff antes de cada commit, na máquina).* Complementa o CI, mas não o substitui (dá para pular). Pode entrar depois se esquecer de formatar virar um problema frequente.
+
+**Custo.** Cada pull request leva um ou dois minutos para ter o resultado. Gratuito para repositório público.
+
+---
+
+## 8. Proteção da branch main
+
+**Etapa:** 2 (Rede de segurança) · **Data:** 2026-11-14
+
+**Contexto.** Com o CI pronto, ainda seria possível fazer push direto na `main` ou fazer merge de um pull request com o CI vermelho.
+
+**Decisão.** Regra de proteção na `main`: mudanças só por pull request, e o merge só é liberado com o CI verde.
+
+**Alternativas.**
+- *Sem proteção, confiando na disciplina.* Funciona até o primeiro descuido.
+- *Exigir também aprovação de outra pessoa.* É o padrão em times, mas o projeto tem um só desenvolvedor, e o GitHub não deixa aprovar o próprio pull request: o merge ficaria impossível.
+
+**Custo.** Até correções pequenas precisam de branch e pull request. É justamente o fluxo que o projeto quer praticar.
