@@ -4,14 +4,14 @@ Ficam fora das views para que a página (fase 1) e a API (fase 2) usem as
 mesmas funções.
 """
 
-from django.core.cache import cache
 from django.db.models import Prefetch
+
+from core.antispam import RateLimit
 
 from .models import Song, SongSuggestion, Style
 
-# Limite de sugestões por endereço de internet (IP) em uma janela de tempo.
-SUGGESTION_LIMIT = 5
-SUGGESTION_WINDOW_SECONDS = 60 * 60
+# No máximo 5 sugestões por hora por endereço de internet (IP).
+suggestion_rate_limit = RateLimit("song-suggestion", limit=5, window=60 * 60)
 
 
 def public_repertoire():
@@ -40,20 +40,3 @@ def accept_suggestions(suggestions):
 def reject_suggestions(suggestions):
     """Marca as sugestões como recusadas. Devolve quantas mudaram."""
     return suggestions.update(status=SongSuggestion.Status.REJECTED)
-
-
-def suggestion_limit_reached(ip):
-    """Diz se este IP já enviou o máximo de sugestões permitido na janela."""
-    return cache.get(_suggestion_key(ip), 0) >= SUGGESTION_LIMIT
-
-
-def register_suggestion_attempt(ip):
-    """Conta mais um envio deste IP. A contagem some sozinha ao fim da janela."""
-    key = _suggestion_key(ip)
-    # add só cria se não existir: o prazo conta a partir do primeiro envio.
-    if not cache.add(key, 1, SUGGESTION_WINDOW_SECONDS):
-        cache.incr(key)
-
-
-def _suggestion_key(ip):
-    return f"song-suggestion:{ip}"

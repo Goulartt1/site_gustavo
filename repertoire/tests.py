@@ -161,25 +161,25 @@ def test_honeypot_filled_looks_successful_but_saves_nothing(client):
 
 @pytest.mark.django_db
 def test_suggestions_are_limited_per_ip(client):
-    for _ in range(services.SUGGESTION_LIMIT):
+    for _ in range(services.suggestion_rate_limit.limit):
         client.post(URL, valid_data())
 
     response = client.post(URL, valid_data())
 
     assert response.status_code == 429
-    assert SongSuggestion.objects.count() == services.SUGGESTION_LIMIT
+    assert SongSuggestion.objects.count() == services.suggestion_rate_limit.limit
     assert "Tente de novo mais tarde" in response.content.decode()
 
 
 @pytest.mark.django_db
 def test_limit_counts_each_ip_separately(client):
-    for _ in range(services.SUGGESTION_LIMIT):
+    for _ in range(services.suggestion_rate_limit.limit):
         client.post(URL, valid_data(), REMOTE_ADDR="10.0.0.1")
 
     response = client.post(URL, valid_data(), REMOTE_ADDR="10.0.0.2")
 
     assert response.status_code == 302
-    assert SongSuggestion.objects.count() == services.SUGGESTION_LIMIT + 1
+    assert SongSuggestion.objects.count() == services.suggestion_rate_limit.limit + 1
 
 
 # Admin

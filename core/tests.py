@@ -1,7 +1,9 @@
 import pytest
+from django.core.cache import cache
 from django.urls import reverse
 
 from artist.models import ArtistProfile
+from core.antispam import RateLimit
 from core.client_ip import get_client_ip
 
 
@@ -96,3 +98,25 @@ def test_client_ip_uses_worker_header_with_origin_secret(rf, settings):
     request = rf.get("/", REMOTE_ADDR="10.0.0.1", HTTP_X_CLIENT_IP="1.2.3.4")
 
     assert get_client_ip(request) == "1.2.3.4"
+
+
+# Anti-spam comum (core.antispam)
+
+
+@pytest.fixture
+def empty_cache():
+    cache.clear()
+    yield
+    cache.clear()
+
+
+def test_rate_limit_counts_per_scope_and_ip(empty_cache):
+    limit = RateLimit("teste", limit=2, window=60)
+
+    limit.hit("1.1.1.1")
+    assert not limit.reached("1.1.1.1")
+    limit.hit("1.1.1.1")
+
+    assert limit.reached("1.1.1.1")
+    assert not limit.reached("2.2.2.2")
+    assert not RateLimit("outro", limit=2, window=60).reached("1.1.1.1")

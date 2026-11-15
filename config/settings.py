@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "artist",
     "core",
     "repertoire",
+    "testimonials",
 ]
 
 MIDDLEWARE = [
