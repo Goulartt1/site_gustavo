@@ -33,6 +33,80 @@ uv sync
 | `notepad .env` | Abre o arquivo no Bloco de Notas (ou `code .env` para o VS Code). |
 | `Rename-Item .env .env.off` | Renomeia um arquivo. Útil para testar o projeto sem o `.env` (e desfazer com `Rename-Item .env.off .env`). |
 
+## PostgreSQL local
+
+### Instalação (uma vez por computador)
+
+**1. Instalar o PostgreSQL 18**
+
+```powershell
+winget search --id PostgreSQL.PostgreSQL
+winget install --id PostgreSQL.PostgreSQL.18 --interactive
+```
+
+- `winget search` lista as versões disponíveis; `--id` filtra pelo identificador do pacote.
+- `winget install --id ...` instala aquele pacote. `--interactive` mostra as telas do instalador em vez de instalar em silêncio, para você escolher a senha.
+- No instalador: defina a senha do administrador `postgres` (guarde num gerenciador de senhas), mantenha a porta `5432` e desmarque o "Stack Builder" no fim (não é necessário).
+
+**2. Colocar o `psql` no PATH**
+
+O instalador não faz isso. O PATH é a lista de pastas onde o terminal procura programas.
+
+```powershell
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+[Environment]::SetEnvironmentVariable("Path", "$userPath;C:\Program Files\PostgreSQL\18\bin", "User")
+```
+
+- A primeira linha lê o PATH do seu usuário; a segunda grava o mesmo PATH com a pasta do PostgreSQL no fim.
+- Feche e abra o terminal, e confira com `psql --version`.
+
+**3. Criar o usuário e o banco do projeto**
+
+```powershell
+psql -U postgres
+```
+
+`psql` é o terminal do PostgreSQL; `-U postgres` entra como administrador (pede a senha do passo 1). Dentro dele (o prompt muda para `postgres=#`):
+
+```sql
+CREATE ROLE site_gustavo WITH LOGIN PASSWORD 'escolha-uma-senha' CREATEDB;
+CREATE DATABASE site_gustavo OWNER site_gustavo;
+\q
+```
+
+- `CREATE ROLE ... LOGIN` cria um usuário que pode se conectar. `CREATEDB` deixa ele criar bancos (o pytest precisa, para o banco de teste).
+- `CREATE DATABASE ... OWNER` cria o banco do projeto com esse usuário como dono.
+- `\q` sai do `psql`. Comandos SQL terminam com `;`; comandos do próprio `psql` começam com `\`.
+- Na senha, use só letras e números: ela vai dentro de uma URL no `.env`, onde `@`, `:` e `/` têm significado especial.
+
+**4. Apontar o projeto para o PostgreSQL**
+
+No `.env`, acrescente (ou ajuste) a linha, com a senha do passo 3:
+
+```
+DATABASE_URL=postgres://site_gustavo:escolha-uma-senha@localhost:5432/site_gustavo
+```
+
+**5. Criar as tabelas e conferir**
+
+```powershell
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run pytest
+```
+
+O banco novo começa vazio: o `migrate` cria as tabelas e o `createsuperuser` cria o seu login do Admin. O `db.sqlite3` antigo pode ser apagado (`Remove-Item db.sqlite3`).
+
+### Comandos do dia a dia
+
+| Comando | O que faz |
+| --- | --- |
+| `psql -U site_gustavo -d site_gustavo` | Entra no banco do projeto com o usuário do projeto. `-d` escolhe o banco. |
+| `\dt` (dentro do `psql`) | Lista as tabelas do banco. |
+| `\d accounts_user` (dentro do `psql`) | Mostra as colunas de uma tabela. |
+| `SELECT id, username, is_superuser FROM accounts_user;` | Consulta SQL: lista os usuários. Horários aparecem em UTC (ver decisão 4). |
+| `uv run python manage.py dbshell` | Abre o `psql` já conectado com os dados do `DATABASE_URL`. |
+
 ## Django (manage.py)
 
 | Comando | O que faz |
