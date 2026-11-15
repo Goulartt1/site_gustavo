@@ -12,9 +12,7 @@
         <p class="animate-rise max-w-[30rem] text-xl leading-relaxed text-sand [animation-delay:240ms]">{{ artist.headline }}</p>
       {% endif %}
       <div class="animate-rise flex flex-wrap gap-3.5 [animation-delay:360ms]">
-        {% if whatsapp_link %}
-          <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="inline-flex min-h-12 items-center rounded-full bg-caramel px-6 font-semibold text-wood-950 transition hover:-translate-y-0.5">Pedir orçamento no WhatsApp</a>
-        {% endif %}
+        <a href="{% url 'quotes:index' %}" class="inline-flex min-h-12 items-center rounded-full bg-caramel px-6 font-semibold text-wood-950 transition hover:-translate-y-0.5">Pedir orçamento</a>
         {% if artist.bio %}
           <a href="#sobre" class="inline-flex min-h-12 items-center rounded-full border-[1.5px] border-cream/35 px-6 font-semibold text-cream transition hover:-translate-y-0.5 hover:border-cream">Conhecer o artista</a>
         {% endif %}
@@ -74,12 +72,10 @@
   {% endif %}
 
   {# Chamada final #}
-  {% if whatsapp_link %}
-    <section id="orcamento" class="bg-leather">
-      <div class="reveal mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-8 px-6 py-24 sm:px-8">
-        <h2 class="max-w-3xl font-display text-[clamp(3.5rem,7vw,6.5rem)] leading-[0.95] font-light tracking-[-0.02em] italic">Bora marcar o seu baile?</h2>
-        <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="inline-flex min-h-15 items-center rounded-full bg-cream px-8 text-lg font-semibold text-wood-950 transition hover:-translate-y-0.5">Pedir orçamento no WhatsApp</a>
-      </div>
-    </section>
-  {% endif %}
+  <section id="orcamento" class="bg-leather">
+    <div class="reveal mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-8 px-6 py-24 sm:px-8">
+      <h2 class="max-w-3xl font-display text-[clamp(3.5rem,7vw,6.5rem)] leading-[0.95] font-light tracking-[-0.02em] italic">Bora marcar o seu baile?</h2>
+      <a href="{% url 'quotes:index' %}" class="inline-flex min-h-15 items-center rounded-full bg-cream px-8 text-lg font-semibold text-wood-950 transition hover:-translate-y-0.5">Ver datas e pedir orçamento</a>
+    </div>
+  </section>
 {% endblock %}
