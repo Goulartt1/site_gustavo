@@ -46,5 +46,8 @@ select = ["E", "W", "F", "I", "B", "UP", "DJ"]
 DJANGO_SETTINGS_MODULE = "config.settings"
 # Arquivos onde o pytest procura testes.
 python_files = ["tests.py", "test_*.py"]
+# Classes de teste só se terminarem em "Tests". O padrão do pytest ("Test*")
+# confundia o modelo Testimonial com uma classe de teste.
+python_classes = ["*Tests"]
 # A pasta staticfiles/ só existe depois do collectstatic (no deploy).
 filterwarnings = ["ignore:No directory at:UserWarning"]

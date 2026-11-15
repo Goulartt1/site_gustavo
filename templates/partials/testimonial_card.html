@@ -1,0 +1,6 @@
+{# Um depoimento aprovado. Usado na página de depoimentos e na página inicial. #}
+<figure class="stitch flex h-full flex-col gap-6 rounded-2xl p-7">
+  <span aria-hidden="true" class="font-display text-7xl leading-[0.5] text-caramel">“</span>
+  <blockquote class="flex-1 text-lg leading-relaxed text-sand">{{ testimonial.text|linebreaksbr }}</blockquote>
+  <figcaption class="font-display text-2xl text-cream italic">{{ testimonial.name }}</figcaption>
+</figure>

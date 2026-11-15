@@ -6,6 +6,7 @@
       <a href="{% url 'core:home' %}#sobre" class="text-cream/80 transition hover:text-caramel">Sobre</a>
     {% endif %}
     <a href="{% url 'repertoire:index' %}" class="text-cream/80 transition hover:text-caramel"{% if request.resolver_match.app_name == "repertoire" %} aria-current="page"{% endif %}>Repertório</a>
+    <a href="{% url 'testimonials:index' %}" class="text-cream/80 transition hover:text-caramel"{% if request.resolver_match.app_name == "testimonials" %} aria-current="page"{% endif %}>Depoimentos</a>
     {% if whatsapp_link %}
       <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-caramel px-5 font-semibold text-caramel transition hover:bg-caramel hover:text-wood-950">Pedir orçamento</a>
     {% endif %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Depoimentos · {{ artist.name|default:"Artista" }}{% endblock %}
+{% block description %}O que dizem de quem já contratou {{ artist.name|default:"o artista" }}. Deixe também o seu depoimento.{% endblock %}
+
+{# A mensagem de "obrigado" aparece junto do formulário, não no topo da página. #}
+{% block messages %}{% endblock %}
+
+{% block content %}
+  {# Abertura #}
+  <section class="mx-auto flex max-w-6xl flex-col gap-7 px-6 pt-8 pb-16 sm:px-8">
+    <p class="animate-rise text-sm tracking-[0.22em] uppercase text-caramel">Depoimentos</p>
+    <h1 class="animate-rise font-display text-[clamp(3.75rem,10vw,8rem)] leading-[0.9] font-light tracking-[-0.03em] italic [animation-delay:120ms]">Quem dançou, recomenda</h1>
+    <p class="animate-rise max-w-2xl text-xl leading-relaxed text-sand [animation-delay:240ms]">Casamentos, aniversários, bailes e bares: o que dizem as pessoas que já estiveram na pista.</p>
+    <a href="#deixar" class="animate-rise inline-flex min-h-11 items-center self-start rounded-full bg-caramel px-5 font-semibold text-wood-950 transition hover:-translate-y-0.5 [animation-delay:360ms]">Deixar meu depoimento</a>
+  </section>
+
+  {# Depoimentos aprovados #}
+  <div class="mx-auto max-w-6xl px-6 pb-28 sm:px-8">
+    {% if testimonials %}
+      <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for testimonial in testimonials %}
+          <li class="reveal">{% include "partials/testimonial_card.html" %}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="stitch rounded-2xl px-6 py-10 text-center text-lg text-sand">Ainda não há depoimentos publicados. Que tal ser a primeira pessoa?</p>
+    {% endif %}
+  </div>
+
+  {# Formulário #}
+  <section id="deixar" class="scroll-mt-8 bg-cream text-wood-950">
+    <div class="mx-auto grid max-w-6xl gap-12 px-6 py-24 sm:px-8 lg:grid-cols-[1fr_1.2fr]">
+      <div class="flex flex-col gap-5">
+        <p class="text-sm tracking-[0.22em] uppercase text-leather">Seu depoimento</p>
+        <h2 class="font-display text-6xl leading-none tracking-[-0.02em]">Conte como foi</h2>
+        <p class="text-lg leading-relaxed text-bark">Contratou {{ artist.name|default:"o artista" }} para um evento? Conte como foi. O depoimento aparece aqui depois de aprovado.</p>
+      </div>
+
+      <form method="post" action="{% url 'testimonials:index' %}#deixar" class="public-form flex flex-col gap-5" novalidate>
+        {% csrf_token %}
+
+        {% include "partials/public_form_fields.html" %}
+
+        <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Enviar depoimento</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
