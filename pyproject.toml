@@ -10,9 +10,12 @@ requires-python = ">=3.13"
 dependencies = [
     "django>=5.2,<5.3",
     "django-environ>=0.14.0",
+    "django-storages[s3]>=1.14.6",
     "django-tailwind-cli>=4.8.2",
+    "gunicorn>=27.0.1",
     "pillow>=13.0.0",
     "psycopg[binary]>=3.3.9",
+    "whitenoise>=6.12.0",
 ]
 
 [dependency-groups]
@@ -43,3 +46,5 @@ select = ["E", "W", "F", "I", "B", "UP", "DJ"]
 DJANGO_SETTINGS_MODULE = "config.settings"
 # Arquivos onde o pytest procura testes.
 python_files = ["tests.py", "test_*.py"]
+# A pasta staticfiles/ só existe depois do collectstatic (no deploy).
+filterwarnings = ["ignore:No directory at:UserWarning"]
