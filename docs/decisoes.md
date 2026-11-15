@@ -139,3 +139,41 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *Exigir também aprovação de outra pessoa.* É o padrão em times, mas o projeto tem um só desenvolvedor, e o GitHub não deixa aprovar o próprio pull request: o merge ficaria impossível.
 
 **Custo.** Até correções pequenas precisam de branch e pull request. É justamente o fluxo que o projeto quer praticar.
+
+---
+
+## 9. PostgreSQL nativo no Windows, com usuário próprio do projeto
+
+**Etapa:** 3 (PostgreSQL local) · **Data:** 2026-11-14
+
+**Contexto.** A produção vai usar PostgreSQL. Desenvolver em SQLite esconde diferenças (o PostgreSQL é mais rígido com tipos, tamanhos de texto e consultas com datas), que só apareceriam no deploy.
+
+**Decisão.**
+- PostgreSQL 18 instalado no Windows pelo `winget` (instalador interativo, para o dono do projeto definir a senha do administrador).
+- O projeto usa um usuário próprio (`site_gustavo`), dono do banco `site_gustavo`, com permissão `CREATEDB` (o pytest cria e apaga um banco de teste a cada execução). O administrador `postgres` fica só para manutenção.
+- O CI roda os testes num contêiner `postgres:18`, a mesma versão.
+
+**Alternativas.**
+- *Docker.* Banco isolado e fácil de recriar, mas exige WSL2, adiado para a fase 4.
+- *Banco na nuvem para desenvolvimento (ex.: Neon).* Sem instalação, mas depende de internet e de conta externa.
+- *Continuar no SQLite.* Zero instalação, mas diverge da produção.
+- *Usar o administrador `postgres` no projeto.* Menos passos, mas uma senha vazada daria acesso a tudo no servidor de banco. O usuário próprio limita o estrago ao banco do projeto.
+- *CI em SQLite.* Um pouco mais rápido, mas deixaria passar erros que só acontecem no PostgreSQL.
+
+**Custo.** Um serviço a mais rodando no Windows (inicia junto com o sistema). O SQLite continua funcionando como reserva (sem `DATABASE_URL`), mas não é mais o padrão.
+
+---
+
+## 10. Driver psycopg 3 (binary)
+
+**Etapa:** 3 (PostgreSQL local) · **Data:** 2026-11-14
+
+**Contexto.** O Django precisa de um driver para conversar com o PostgreSQL.
+
+**Decisão.** `psycopg[binary]` (psycopg 3), nas dependências principais. O extra `binary` traz a biblioteca já compilada.
+
+**Alternativas.**
+- *psycopg2.* O driver clássico, ainda muito encontrado em tutoriais e projetos antigos. Funciona, mas está só em manutenção; o Django recomenda o psycopg 3 em projetos novos.
+- *psycopg 3 sem `binary` (ou com `c`).* Exige ter a biblioteca do PostgreSQL (`libpq`) e ferramentas de compilação na máquina. Ganho de desempenho irrelevante para este projeto.
+
+**Custo.** Nenhum relevante. Se a hospedagem exigir, trocar o extra é uma linha no `pyproject.toml`.
