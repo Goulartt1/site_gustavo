@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% load seo %}
+
+{% block meta %}
+  {% include "partials/meta.html" %}
+  {% artist_jsonld %}
+{% endblock %}
 
 {% block content %}
   {# Abertura #}
