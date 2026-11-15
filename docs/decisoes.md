@@ -232,3 +232,52 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *Variáveis de ambiente.* São para configuração técnica, não para conteúdo editável.
 
 **Custo.** Uma consulta ao banco por página (o perfil). Irrelevante no volume deste site; se um dia pesar, dá para usar cache.
+
+---
+
+## 14. Hospedagem: Google Cloud Run + Neon + Cloudflare (R2 e Worker)
+
+**Etapa:** 5 (Deploy) · **Data:** 2026-11-15
+
+**Contexto.** Músico iniciante, com pouquíssimos acessos previstos. O plano gratuito do Render (site dorme e leva ~1 minuto para acordar; banco expira em 30 dias) foi descartado pelo dono do projeto. Orçamento: o menor possível, com proteção contra gastos inesperados.
+
+**Decisão.**
+- **Site:** Google Cloud Run em São Paulo (`southamerica-east1`), imagem montada pelo Cloud Build a partir do `Dockerfile`. Desliga quando ninguém acessa e só cobra enquanto responde; com pouco acesso, fica dentro da cota gratuita mensal (em São Paulo a cota rende ~30% menos que nas regiões mais baratas, ainda assim sobra). Contrapartida: alguns segundos de espera na primeira visita depois de um tempo parado.
+- **Banco:** Neon Free em São Paulo (1 GB, sem prazo de validade, sem cartão).
+- **Fotos:** Cloudflare R2 (10 GB grátis), bucket privado com links assinados, via `django-storages`.
+- **Estáticos:** WhiteNoise (nomes com hash e compressão) e cache no Cloudflare.
+- **Domínio e entrada:** `gustavolocks.com.br` no Registro.br, DNS no Cloudflare e um Cloudflare Worker repassando as visitas ao Cloud Run (em São Paulo o Cloud Run não liga domínio próprio diretamente, e o plano gratuito do Cloudflare não troca o cabeçalho Host sem um Worker).
+- **Segredos:** Google Secret Manager (dentro da cota gratuita).
+- **Migrações:** por enquanto rodadas do PC apontando para o Neon, antes do deploy. Deploy manual com `gcloud run deploy`; automatizar na fase 4.
+
+**Alternativas.**
+- *Render Starter (US$ 7/mês, ~R$ 40).* Sempre ligado e mais simples, mas paga capacidade ociosa num site com pouco acesso. Caminho natural se o movimento crescer ou a espera incomodar.
+- *Tudo no Render (~US$ 13/mês, ~R$ 77).* Uma conta só, mas pesado para o orçamento.
+- *Fly.io com desligamento automático.* Também cobra só o uso (alguns reais/mês), mas o banco gerenciado deles é caro (US$ 38/mês) e o gratuito acabou.
+- *AWS Lightsail (US$ 5/mês).* Servidor "cru": exigiria manter Linux, servidor web, HTTPS e atualizações. O plano gratuito da AWS expira em 6 meses.
+- *Supabase.* Não hospeda o Django; o plano gratuito pausa o projeto após 7 dias com pouca atividade (exatamente o caso aqui) e o Pro custa US$ 25/mês.
+- *Cloudinary para fotos.* Gratuito, mas o pacote de integração com o Django está praticamente abandonado e tem bug conhecido no Django 5.1+.
+
+**Custo.** Mais peças para entender (Docker, Cloud Run, Worker). A espera de alguns segundos na primeira visita. Domínio passa a ser necessário (R$ 40/ano) para o Cloudflare ficar na frente.
+
+---
+
+## 15. Proteção contra gastos inesperados
+
+**Etapa:** 5 (Deploy) · **Data:** 2026-11-15
+
+**Contexto.** No Cloud Run, um robô acessando sem parar poderia gerar custo de processamento e de tráfego. O padrão do Cloud Run é subir até 100 cópias do site, e os orçamentos do Google só avisam, não cortam.
+
+**Decisão.** Defesa em camadas:
+1. **Teto técnico:** `--max-instances 1`, CPU cobrada só durante as visitas.
+2. **Cloudflare na frente:** Bot Fight Mode, limite de 30 acessos a cada 10 s por IP, cache dos estáticos. O Worker gratuito para de responder após 100 mil acessos/dia, sem cobrança.
+3. **Porta única:** o Django recusa (403) visitas sem o cabeçalho `X-Origin-Secret`, que só o Worker envia (`core/middleware.py`). Ninguém pula o Cloudflare usando o endereço `.run.app`.
+4. **Avisos graduais:** um orçamento de R$ 50/mês manda e-mail a cada R$ 5 gastos (10% a 100%), mais um alerta de previsão em R$ 10. Os avisos são gratuitos.
+5. **Disjuntor:** o mesmo orçamento publica o gasto num tópico Pub/Sub; uma função (`infra/disjuntor`) muda a entrada do serviço para "somente interna" quando o gasto chega a R$ 50. Reversível com um comando; nada é apagado.
+
+**Alternativas.**
+- *Só os avisos por e-mail.* Não cortam o gasto e chegam com horas de atraso.
+- *Disjuntor que desliga o faturamento do projeto (exemplo da documentação do Google).* Corta tudo, mas pode levar à exclusão de recursos se o faturamento não for religado a tempo. Fechar só a entrada do serviço é mais seguro.
+- *Load balancer do Google com Cloud Armor.* Proteção mais completa, mas custa por volta de US$ 18/mês só para existir.
+
+**Custo.** Configuração inicial maior (passos 6 e 10 do `docs/deploy.md`). Num ataque extremo, o site fica fora do ar até ser reaberto, o que é a troca escolhida: site fechado em vez de conta alta.

@@ -60,3 +60,12 @@ jobs:
 
       - name: Testes (pytest)
         run: uv run pytest
+
+      # Mesma checagem de segurança que o Django recomenda antes de publicar.
+      # Valores com o formato dos de produção (chave longa, domínio definido),
+      # senão a checagem reclama deles e não das configurações de verdade.
+      - name: Checagem de deploy (manage.py check --deploy)
+        env:
+          SECRET_KEY: chave-falsa-do-ci-longa-o-bastante-para-a-checagem-de-deploy-0123456789
+          ALLOWED_HOSTS: gustavolocks.com.br
+        run: uv run python manage.py check --deploy --fail-level WARNING

@@ -173,6 +173,30 @@ O CSS do site é gerado a partir de `tailwind/source.css` e das classes usadas n
 Formato `tipo(escopo): descrição`, com a descrição em português. Ex.: `feat(accounts): cria modelo de usuário próprio`.
 Tipos usados: `feat` (funcionalidade), `fix` (correção), `docs` (documentação), `test` (testes), `refactor` (reorganização sem mudar comportamento), `build` (dependências), `ci` (integração contínua), `chore` (manutenção).
 
+## Google Cloud (gcloud)
+
+O passo a passo completo do deploy está em `docs/deploy.md`. Os mais usados:
+
+| Comando | O que faz |
+| --- | --- |
+| `winget install --id Google.CloudSDK` | Instala a CLI do Google Cloud (`gcloud`). |
+| `gcloud init` | Faz login (abre o navegador) e escolhe o projeto padrão. |
+| `gcloud run deploy gustavo-locks --source . --region southamerica-east1` | Monta a imagem a partir do `Dockerfile` e publica a versão nova do site. |
+| `gcloud run services describe gustavo-locks --region southamerica-east1` | Mostra a configuração atual do serviço (endereço, teto de instâncias, variáveis). |
+| `gcloud run services logs read gustavo-locks --region southamerica-east1 --limit 50` | Mostra os últimos registros (logs) do site, inclusive erros. |
+| `gcloud run services update gustavo-locks --region southamerica-east1 --ingress=all` | Reabre o site ao público depois que o disjuntor o fechou. |
+| `gcloud functions logs read disjuntor --region southamerica-east1` | Mostra o que o disjuntor decidiu nas últimas notificações de gasto. |
+
+### Rodar comandos do Django no banco de produção (Neon)
+
+```powershell
+$env:DATABASE_URL = "connection-string-do-neon"
+uv run python manage.py migrate
+Remove-Item Env:DATABASE_URL
+```
+
+A variável vale só nesta janela do terminal e é apagada no fim, para não mexer em produção sem querer.
+
 ## gh (GitHub CLI)
 
 | Comando | O que faz |

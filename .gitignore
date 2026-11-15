@@ -21,3 +21,5 @@ assets/css/tailwind.css
 
 # Arquivos enviados pelo Admin em desenvolvimento
 media/
+staticfiles/
+

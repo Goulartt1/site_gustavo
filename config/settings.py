@@ -36,6 +36,18 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
+# Endereços de onde formulários podem ser enviados (ex.: https://gustavolocks.com.br).
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Produção: as visitas chegam pelo Worker do Cloudflare, que repassa ao Cloud Run.
+# O Worker informa o domínio original no cabeçalho X-Forwarded-Host.
+USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
+
+# "Senha" que o Worker envia em toda visita (cabeçalho X-Origin-Secret).
+# Com ela definida, visitas que não passaram pelo Cloudflare (ex.: direto no
+# endereço .run.app) são recusadas logo no começo, gastando o mínimo.
+ORIGIN_SECRET = env("ORIGIN_SECRET", default="")
+
 
 # Application definition
 
@@ -55,7 +67,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Primeiro de todos: recusa quem não veio pelo Cloudflare (ver ORIGIN_SECRET).
+    "core.middleware.RequireOriginSecretMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # Serve CSS, JS e fontes direto do Django, com compressão e cache longo.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -95,6 +111,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
 }
+# Reaproveita a conexão por até 60 s em vez de abrir uma a cada página, e
+# testa antes de usar (o Neon desliga o banco quando fica parado).
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
 
 # Modelo de usuário do projeto (accounts.User) no lugar do padrão (auth.User).
@@ -150,11 +170,68 @@ STATICFILES_DIRS = [BASE_DIR / "assets"]
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_VERSION = "4.3.5"
 
+# Para onde o "collectstatic" junta os estáticos no deploy (fora do git).
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Arquivos enviados pelo Admin (ex.: foto do artista).
-# Em desenvolvimento ficam na pasta media/; em produção, o destino será
-# definido junto com a hospedagem (etapa 5).
+# Sem R2 configurado (desenvolvimento), ficam na pasta media/.
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    # Nomes com hash do conteúdo (tailwind.3f9a1c.css) e versões comprimidas:
+    # o navegador pode guardar em cache por muito tempo sem ficar desatualizado.
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# Em produção, as fotos vão para o Cloudflare R2 (o disco do servidor é apagado
+# a cada deploy). O bucket é privado: o site gera links assinados que expiram.
+R2_BUCKET_NAME = env("R2_BUCKET_NAME", default="")
+if R2_BUCKET_NAME:
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": R2_BUCKET_NAME,
+            "endpoint_url": env("R2_ENDPOINT_URL"),
+            "access_key": env("R2_ACCESS_KEY_ID"),
+            "secret_key": env("R2_SECRET_ACCESS_KEY"),
+            "region_name": "auto",
+            "signature_version": "s3v4",
+            "default_acl": None,
+            "file_overwrite": False,
+            "querystring_auth": True,
+            "querystring_expire": 60 * 60,
+        },
+    }
+
+
+# Segurança em produção (DEBUG desligado)
+if not DEBUG:
+    # O Cloudflare e o Cloud Run recebem o HTTPS e repassam ao Django; este
+    # cabeçalho diz que a visita original veio por HTTPS.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # HSTS: o navegador passa a usar só HTTPS neste endereço pelo tempo definido.
+    SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=60 * 60 * 24 * 30)
+    # Vale também para subdomínios (todos serão servidos por HTTPS).
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Checagens desligadas de propósito:
+# - security.W021 (HSTS preload): entrar na lista de pré-carga dos navegadores é
+#   difícil de desfazer; só faz sentido com o domínio definitivo e estável.
+SILENCED_SYSTEM_CHECKS = ["security.W021"]
+
+
+# Logs: erros vão para a saída padrão e aparecem nos logs do Cloud Run.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
