@@ -39,6 +39,15 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Textos da interface, documentação e mensagens de commit em português.
 - Commits e títulos de pull request no padrão Conventional Commits: `tipo(escopo): descrição` (ex.: `feat(accounts): cria modelo de usuário próprio`).
 
+## O artista (do material de divulgação, recebido em 2026-11-15)
+- Gustavo Locks: músico, gaiteiro e cantor; toca desde criança; mais de 400 eventos e bailes.
+- Estilos: gaúchas, sertanejo universitário, forró, pagode, modão e reggae. O diferencial é a versatilidade.
+- Eventos: bares e restaurantes, aniversários, casamentos, bailes e eventos tradicionais, corporativos.
+- "Novo Projeto": uma banda completa em um único músico. O teclado é interligado ao acordeon e ele controla guitarra, bateria, baixo, violão etc., 100% ao vivo, sem playback nem VS. Vantagens: praticidade, menos espaço, contratação simples, variedade e som de banda completa.
+- Orçamento personalizado: considera tipo de evento, duração, estrutura e necessidades (o pedido da etapa 10 deve perguntar o tipo de evento).
+- Contato: WhatsApp com DDD 48 (região de Florianópolis, SC) e Instagram @locksgustavo. O número entra pelo Admin, não no código.
+- Visual do material: fundo grafite, títulos condensados em caixa alta, fotos recortadas de chapéu e acordeon; há uma marca "Gustavo Locks" no teclado.
+
 ## Funções
 ### Visitante
 - Apresentação/bio do artista
@@ -97,9 +106,9 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 11. Redes, botão flutuante e SEO básico
 
 ## Pendências
-- Nome artístico (Gustavo Locks) e estilo (música gaúcha e forró) definidos; faltam cidade, número do WhatsApp e redes sociais (usar dados de exemplo até lá)
+- Nome, estilos, WhatsApp e Instagram recebidos (ver seção O artista); faltam a cidade exata e a área de atendimento, nome do "Novo Projeto" (se houver), canal do YouTube e a lista real de músicas
 - Fotos e vídeos reais
-- Visual: direção A · Galpão definida (cores, fontes, estilo); faltam logotipo (se houver) e fotos reais
+- Visual: direção A · Galpão definida (cores, fontes, estilo); faltam o arquivo do logotipo (se houver) e fotos reais; as fotos do material podem servir de provisórias, se o artista autorizar
 - Contas de produção a criar pelo dono do projeto (Registro.br, Cloudflare, Neon, Google Cloud): passo a passo em `docs/deploy.md`
 
 ## Regras de segurança e privacidade
