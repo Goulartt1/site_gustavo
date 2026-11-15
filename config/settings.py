@@ -225,7 +225,7 @@ if not DEBUG:
 SILENCED_SYSTEM_CHECKS = ["security.W021"]
 
 
-# Logs: erros aparecem no painel do Render (saída padrão).
+# Logs: erros vão para a saída padrão e aparecem nos logs do Cloud Run.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
