@@ -272,8 +272,8 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 1. **Teto técnico:** `--max-instances 1`, CPU cobrada só durante as visitas.
 2. **Cloudflare na frente:** Bot Fight Mode, limite de 30 acessos a cada 10 s por IP, cache dos estáticos. O Worker gratuito para de responder após 100 mil acessos/dia, sem cobrança.
 3. **Porta única:** o Django recusa (403) visitas sem o cabeçalho `X-Origin-Secret`, que só o Worker envia (`core/middleware.py`). Ninguém pula o Cloudflare usando o endereço `.run.app`.
-4. **Avisos:** orçamento de R$ 20/mês com e-mails em 25%, 50%, 75%, 90% e 100%, mais o alerta de previsão. Os avisos são gratuitos.
-5. **Disjuntor:** orçamento de R$ 50/mês ligado a um tópico Pub/Sub; uma função (`infra/disjuntor`) muda a entrada do serviço para "somente interna" quando o gasto chega a R$ 50. Reversível com um comando; nada é apagado.
+4. **Avisos graduais:** um orçamento de R$ 50/mês manda e-mail a cada R$ 5 gastos (10% a 100%), mais um alerta de previsão em R$ 10. Os avisos são gratuitos.
+5. **Disjuntor:** o mesmo orçamento publica o gasto num tópico Pub/Sub; uma função (`infra/disjuntor`) muda a entrada do serviço para "somente interna" quando o gasto chega a R$ 50. Reversível com um comando; nada é apagado.
 
 **Alternativas.**
 - *Só os avisos por e-mail.* Não cortam o gasto e chegam com horas de atraso.

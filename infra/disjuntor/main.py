@@ -1,6 +1,6 @@
 """Disjuntor de gastos (Cloud Run function).
 
-O orçamento "disjuntor" do Google Cloud publica o gasto do mês num tópico do
+O orçamento do projeto no Google Cloud publica o gasto do mês num tópico do
 Pub/Sub várias vezes ao dia. Esta função recebe cada publicação e, quando o
 gasto chega ao valor do orçamento (R$ 50), muda a entrada do serviço do Cloud
 Run para "somente interna": o site para de responder à internet e o custo

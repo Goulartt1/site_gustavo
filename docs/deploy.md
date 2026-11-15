@@ -26,7 +26,7 @@ Proteções contra gasto inesperado (decisão 15 em `docs/decisoes.md`):
 
 1. Cloud Run com no máximo 1 instância (teto de processamento).
 2. Cloudflare: Bot Fight Mode, limite de acessos por IP e cache dos estáticos. O Worker gratuito tem limite de 100 mil acessos por dia: passou disso, ele para de responder até o dia seguinte, sem cobrança.
-3. Avisos por e-mail: orçamento de R$ 20 com alertas em 25%, 50%, 75%, 90% e 100%, mais o alerta de previsão.
+3. Avisos graduais por e-mail: a cada R$ 5 gastos no mês (R$ 5, 10, 15... até 50), mais o alerta de previsão.
 4. Disjuntor: ao chegar em R$ 50 no mês, o site é fechado ao público automaticamente.
 
 Além disso, o Django recusa visitas que não passaram pelo Worker (cabeçalho `X-Origin-Secret`), então ninguém consegue pular o Cloudflare acessando o endereço `.run.app` direto.
@@ -105,19 +105,31 @@ gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregi
 gcloud projects describe gustavo-locks --format="value(projectNumber)"
 ```
 
-## 6. Orçamentos: avisos e disjuntor
+## 6. Orçamento: avisos graduais e disjuntor
+
+Um único orçamento faz as duas coisas: manda os e-mails graduais e aciona o disjuntor. Os avisos são gratuitos; o valor do orçamento é só a régua.
 
 No console: **Faturamento → Orçamentos e alertas → Criar orçamento**.
 
-**Orçamento "Avisos"**
-- Projeto: `gustavo-locks`; período mensal; valor **R$ 20**.
-- Limites: **25%, 50%, 75%, 90% e 100% do gasto real**, mais **100% do gasto previsto**.
-- Notificações: e-mail para administradores de faturamento (você).
+- Nome: `Avisos e disjuntor`; projeto `gustavo-locks`; período **mensal**; valor **R$ 50**.
+- Limites de gasto **real**: **10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90% e 100%**. Cada um manda um e-mail:
 
-**Orçamento "Disjuntor"**
-- Projeto: `gustavo-locks`; período mensal; valor **R$ 50**.
-- Limite: 100% do gasto real.
-- Em **Gerenciar notificações**, marque **Conectar um tópico do Pub/Sub** e crie o tópico `orcamento-disjuntor`.
+  | Limite | Gasto no mês |
+  | --- | --- |
+  | 10% | R$ 5 |
+  | 20% | R$ 10 |
+  | 30% | R$ 15 |
+  | 40% | R$ 20 |
+  | 50% | R$ 25 |
+  | 60% | R$ 30 |
+  | 70% | R$ 35 |
+  | 80% | R$ 40 |
+  | 90% | R$ 45 |
+  | 100% | R$ 50: o disjuntor fecha o site |
+
+- Mais um limite de gasto **previsto** em **20% (R$ 10)**: avisa logo nos primeiros dias se o ritmo indicar que o mês vai passar de R$ 10, antes de o gasto acontecer.
+- Notificações: e-mail para administradores de faturamento (você).
+- Em **Gerenciar notificações**, marque **Conectar um tópico do Pub/Sub** e crie o tópico `orcamento-disjuntor`. É por ele que o disjuntor (passo 10) recebe o gasto do mês.
 
 > O Google atualiza os gastos com algumas horas de atraso. Por isso o teto de 1 instância (passo 8) é a proteção imediata; os orçamentos são a segunda linha.
 
@@ -196,7 +208,7 @@ gcloud artifacts repositories set-cleanup-policies cloud-run-source-deploy --loc
 
 ## 10. Disjuntor
 
-Publica a função que fecha o site quando o orçamento "Disjuntor" chega a R$ 50:
+Publica a função que fecha o site quando o orçamento chega a 100% (R$ 50):
 
 ```powershell
 gcloud functions deploy disjuntor `
@@ -229,7 +241,7 @@ O log deve mostrar "Gasto 0.5 de 50: site continua no ar."
 ### Se o disjuntor fechar o site
 
 1. Veja nos orçamentos e em **Cloud Run → gustavo-locks → Métricas** o que causou o gasto.
-2. O orçamento continua acima do limite até o fim do mês: antes de reabrir, aumente temporariamente o orçamento "Disjuntor" (senão a função fecha de novo na próxima notificação).
+2. O gasto continua acima do limite até o fim do mês: antes de reabrir, aumente temporariamente o valor do orçamento (senão a função fecha de novo na próxima notificação).
 3. Reabra o site:
 
 ```powershell
