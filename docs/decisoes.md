@@ -394,3 +394,27 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 
 **Custo.** Primeira biblioteca JavaScript do projeto (50 KB, só nesta página) e três templates parciais (`_block`, `_result`, `_availability`). A view atende três tipos de requisição, o que exige testes para cada um.
 
+---
+
+## 21. SEO básico e prévias de compartilhamento
+
+**Etapa:** 11 (Redes, botão flutuante e SEO) · **Data:** 2026-11-15
+
+**Contexto.** O site precisa aparecer bem no Google e, principalmente, gerar uma boa prévia quando o link é colado no WhatsApp ou no Instagram, que é por onde a maioria dos contratantes vai chegar.
+
+**Decisão.**
+- **Meta tags num parcial só** (`templates/partials/meta.html`): título, descrição, endereço canônico e Open Graph (a prévia de compartilhamento). Cada página inclui o parcial no bloco `meta` passando `page_title` e `page_description`; assim o título da aba e o da prévia nunca ficam diferentes.
+- **Endereço canônico** sem parâmetros (`?utm_source=...`), calculado num context processor (`core.context_processors.seo`). Atrás do Cloudflare, domínio e https vêm dos cabeçalhos X-Forwarded-*.
+- **Imagem de compartilhamento estática** (`assets/img/og-default.png`, 1200x630, com as cores da marca). As fotos ficam no R2 com links assinados que expiram em 1 hora; uma prévia guardada pelo WhatsApp quebraria depois disso. É provisória: quando chegarem as fotos, ganha uma foto do artista.
+- **Dados estruturados (JSON-LD, schema.org `MusicGroup`)** na página inicial: nome, estilos, cidade e redes. O texto é escapado para um `</script>` digitado no Admin não fechar o bloco.
+- **`robots.txt`** (tudo liberado, menos `/admin/`) e **`sitemap.xml`** (`django.contrib.sitemaps`) com as quatro páginas públicas.
+- **Favicon em SVG** (as iniciais "GL" com o pesponto), um arquivo só e nítido em qualquer tamanho.
+- **Redes:** no rodapé, os links usam `rel="me"` (dizem aos buscadores que os perfis são do dono do site) e o WhatsApp ganhou ícone. O botão flutuante respeita a área segura do celular e mostra o texto "WhatsApp" no computador.
+
+**Alternativas.**
+- *Título e descrição em blocos separados* (como antes). Funcionava para a aba, mas o Django não deixa repetir o conteúdo de um bloco na prévia: seria preciso escrever tudo duas vezes.
+- *Usar a foto do artista (R2) como imagem da prévia.* Quebraria quando o link assinado expirasse; exigiria parte do bucket pública.
+- *Biblioteca de SEO (ex.: django-meta).* Mais recursos, mas é uma dependência a mais para o que um parcial resolve.
+
+**Custo.** A imagem da prévia é fixa e precisa ser gerada de novo se o nome ou o slogan mudarem. Páginas novas precisam lembrar de incluir o parcial com o próprio título.
+
