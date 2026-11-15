@@ -312,9 +312,9 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 
 **Contexto.** A sugestão de música é o primeiro formulário que qualquer visitante pode enviar. O CLAUDE.md exige proteção contra spam.
 
-**Decisão.** Duas defesas, sem serviço externo e sem clique extra para o visitante:
+**Decisão.** Duas defesas, sem serviço externo e sem clique extra para o visitante. Desde a etapa 8, ficam em `core/antispam.py` e servem a todos os formulários públicos:
 1. **Campo-isca:** um campo `website` fora da tela e escondido de leitores de tela. Robôs costumam preencher tudo; se vier preenchido, o envio é descartado, mas a resposta é a mesma de sucesso, para o robô não descobrir o truque.
-2. **Limite por IP:** no máximo 5 sugestões por hora por endereço (`services.suggestion_limit_reached`). Passou disso, a página responde 429 (Too Many Requests). A contagem fica no cache em memória do Django, suficiente porque o Cloud Run roda uma cópia só do site (`--max-instances 1`); se o site reiniciar, a contagem zera, o que é aceitável.
+2. **Limite por IP:** no máximo 5 sugestões por hora por endereço (`RateLimit` em `core/antispam.py`). Passou disso, a página responde 429 (Too Many Requests). A contagem fica no cache em memória do Django, suficiente porque o Cloud Run roda uma cópia só do site (`--max-instances 1`); se o site reiniciar, a contagem zera, o que é aceitável.
 
 **De onde vem o IP.** Em produção, quem fala com o Django é o Worker do Cloudflare, então o endereço da conexão é o do Cloudflare. O Worker repassa o IP real no cabeçalho `X-Client-IP`, e o Django só confia nele quando `ORIGIN_SECRET` está definido, ou seja, quando o middleware já garantiu que a visita veio do Worker (`core/client_ip.py`).
 
@@ -323,4 +323,26 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *Limite guardado no banco ou no Redis.* Funciona com várias cópias do site, mas hoje há uma só; seria peça a mais sem necessidade.
 
 **Custo.** Robôs que respeitam o CSS (raros) passam pela isca; o limite segura o volume. Pessoas que compartilham o mesmo IP (uma empresa, uma rede de celular) dividem o limite de 5 por hora.
+
+---
+
+## 18. Depoimentos: publicação só com aprovação e autorização obrigatória
+
+**Etapa:** 8 (Depoimentos) · **Data:** 2026-11-15
+
+**Contexto.** Visitantes enviam depoimentos que, aprovados, aparecem no site com o nome de quem escreveu. É o segundo formulário público, muito parecido com a sugestão de música.
+
+**Decisão.**
+- **App `testimonials`** com o modelo `Testimonial` (nome, texto de até 600 caracteres, situação e data). Só os aprovados aparecem (`services.approved_testimonials`).
+- **Autorização obrigatória (LGPD).** Na sugestão de música o nome é opcional e fica só com o artista; aqui ele é publicado, então o formulário só passa com a caixa de autorização marcada.
+- **O artista aprova ou recusa, mas não edita** o texto (campos somente leitura no Admin): o depoimento continua sendo de quem escreveu.
+- **Página `/depoimentos/`** com todos os aprovados e o formulário, e **os 3 mais novos na página inicial**. A seção da home some enquanto não houver nenhum aprovado.
+- **Anti-spam compartilhado.** O campo-isca, o limite por IP e o fluxo de envio saíram do repertório para `core/antispam.py` (`HoneypotForm`, `RateLimit`, `submit_public_form`). Depoimento: 3 por hora por IP (um texto longo, ninguém manda muitos).
+
+**Alternativas.**
+- *Copiar o anti-spam do repertório.* Mais rápido, mas duas cópias da mesma regra tendem a ficar diferentes com o tempo. Com dois formulários, já havia o problema concreto que justifica extrair.
+- *Depoimentos só na página inicial.* Menos uma página, mas a home ficaria comprida conforme os depoimentos chegam.
+- *Deixar o artista corrigir erros de digitação.* Prático, mas publicaria com o nome da pessoa um texto que ela não escreveu.
+
+**Custo.** O artista precisa aprovar cada depoimento antes de aparecer. O `core` passa a conhecer o app `testimonials` (a página inicial reúne as seções dos outros apps).
 
