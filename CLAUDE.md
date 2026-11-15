@@ -17,8 +17,8 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Painel do artista: Django Admin na fase 1; React (Vite) consumindo a API DRF na fase 3
 - Qualidade: ruff (lint e formatação) e pytest-django; GitHub Actions rodando os dois a cada push
 - Métricas: analytics sem cookies e agregado (ex.: Umami ou Cloudflare Web Analytics)
-- Armazenamento das fotos: a definir junto com a hospedagem (precisa ser persistente)
-- Deploy: a definir na fase 1 (sugestão: Render, Railway ou Fly.io)
+- Armazenamento das fotos: Cloudflare R2 (bucket privado, via django-storages)
+- Deploy: Google Cloud Run (São Paulo) + Neon (PostgreSQL, São Paulo) + Cloudflare (DNS, Worker na frente, proteção contra bots); proteção de gastos em camadas (ver `docs/deploy.md` e decisões 14 e 15)
 
 ## Arquitetura (princípios do projeto)
 - Regras de negócio ficam fora das views e dos templates, em funções próprias (ex.: verificar se um horário está livre). Assim a mesma regra serve ao site em templates (fase 1) e à API (fase 2) sem ser reescrita.
@@ -100,7 +100,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Nome artístico (Gustavo Locks) e estilo (música gaúcha e forró) definidos; faltam cidade, número do WhatsApp e redes sociais (usar dados de exemplo até lá)
 - Fotos e vídeos reais
 - Visual: direção A · Galpão definida (cores, fontes, estilo); faltam logotipo (se houver) e fotos reais
-- Hospedagem
+- Contas de produção a criar pelo dono do projeto (Registro.br, Cloudflare, Neon, Google Cloud): passo a passo em `docs/deploy.md`
 
 ## Regras de segurança e privacidade
 - Formulários públicos com proteção anti-spam (captcha ou limite de envios)
