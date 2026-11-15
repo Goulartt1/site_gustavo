@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "core",
     "repertoire",
     "testimonials",
+    "agenda",
 ]
 
 MIDDLEWARE = [
