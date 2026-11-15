@@ -55,8 +55,8 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Repertório
 - Ler depoimentos aprovados e enviar depoimento (fica pendente de aprovação)
 - Sugerir música para o repertório
-- Pedido de orçamento: data, endereço, horário de início e duração → mostra se o horário está livre → abre o WhatsApp com mensagem pronta. SEM preço no site. O pedido NÃO é salvo no banco; só o clique no WhatsApp é contado (ver seção Pedidos de orçamento).
-- Agenda com horários livres/ocupados, sem detalhes dos eventos
+- Pedido de orçamento: data, endereço, horário de início e duração (e tipo de evento) → responde "livre" ou "a consultar", nunca "ocupado" → abre o WhatsApp nos dois casos com mensagem pronta. SEM preço no site. O pedido NÃO é salvo no banco; só o clique no WhatsApp é contado (ver seção Pedidos de orçamento).
+- Sem calendário público por enquanto: a disponibilidade só aparece no pedido de orçamento (decisão 19)
 - Links para Instagram, YouTube e outras redes; botão flutuante do WhatsApp
 
 ### Artista (área logada)
@@ -69,7 +69,10 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 ## Agenda
 - Funciona por horário, não por dia: o músico pode fazer mais de um show no mesmo dia.
 - Um compromisso tem início e fim com data e hora, e pode atravessar a meia-noite.
-- Em aberto (decidir na etapa da agenda): intervalo mínimo entre dois shows, o que o calendário público mostra em um dia parcialmente ocupado, e como bloquear um dia inteiro.
+- Intervalo mínimo entre shows: um valor único no perfil do artista (padrão 2h), aplicado antes e depois de cada compromisso.
+- Dia inteiro (folga, férias): o mesmo modelo BusySlot, com atalho no Admin (00:00 do primeiro dia até 00:00 do dia seguinte ao último).
+- Conflito no Admin gera aviso, não bloqueio: a decisão é do artista.
+- A agenda é interna. Mostrar "ocupado" ao público faria o músico perder contatos (encaixe após cancelamento, ajuste de horário, outra data); ver decisão 19. Calendário público pode voltar se a agenda lotar.
 
 ## Pedidos de orçamento
 - Não são salvos no banco. O site monta a mensagem e abre o WhatsApp; a negociação e o histórico ficam no WhatsApp.
@@ -101,7 +104,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 6. Galeria: fotos e vídeos do YouTube
 7. Repertório e sugestão de música (primeiro formulário público)
 8. Depoimentos com aprovação (candidata a ser feita pelo dono do projeto, com revisão)
-9. Agenda por horário
+9. Agenda interna por horário (sem calendário público)
 10. Pedido de orçamento que abre o WhatsApp
 11. Redes, botão flutuante e SEO básico
 

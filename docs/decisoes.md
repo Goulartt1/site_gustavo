@@ -346,3 +346,26 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 
 **Custo.** O artista precisa aprovar cada depoimento antes de aparecer. O `core` passa a conhecer o app `testimonials` (a página inicial reúne as seções dos outros apps).
 
+---
+
+## 19. Agenda interna, sem calendário público: "livre" ou "a consultar"
+
+**Etapa:** 9 (Agenda) · **Data:** 2026-11-15
+
+**Contexto.** O plano original previa um calendário público com horários livres e ocupados. Na análise da etapa surgiu a pergunta de negócio: mostrar "ocupado" ajuda o músico? Um cliente que vê "ocupado" fecha o site, e o artista nunca fica sabendo. Perde a chance de encaixar o show se outro for cancelado, de ajustar o horário, de sugerir outra data ou de indicar um colega, e perde o termômetro de procura de cada data. Para um artista em início de carreira, uma agenda quase vazia também passa impressão de pouca procura.
+
+**Decisão.**
+- **Agenda só interna** (app `agenda`, modelo `BusySlot`): é a memória do artista e evita dois shows ao mesmo tempo. Sem página pública por enquanto.
+- **Regra `services.is_available(início, fim)`**, com o **intervalo mínimo entre shows** (campo no perfil, padrão 120 minutos) aplicado antes e depois de cada compromisso. Encostar na borda não é conflito; show que atravessa a meia-noite bloqueia os dois dias.
+- **No pedido de orçamento (etapa 10)**, a resposta será "livre" ou "a consultar", e o WhatsApp abre nos dois casos. Os erros não têm o mesmo peso: dizer "livre" quando não está quebra uma promessa; dizer "a consultar" quando está livre não custa nada.
+- **Dias inteiros** usam o mesmo modelo, com atalho no Admin (`services.whole_days`). Uma tabela só para a regra consultar.
+- **Conflito no Admin vira aviso, não bloqueio**: às vezes o artista sabe que dá tempo.
+- O fim depois do início é garantido no formulário e também no banco (`CheckConstraint`).
+
+**Alternativas.**
+- *Calendário público com livre/parcial/ocupado e os horários indisponíveis.* Transparente e poupa mensagens, o que vale para quem tem agenda cheia. Aqui custaria contatos. Fica fácil de acrescentar depois, porque a regra já existe.
+- *Intervalo por compromisso.* Mais preciso, mais trabalho a cada cadastro; o intervalo único resolve hoje.
+- *Modelo separado para dias bloqueados.* Mais claro no Admin, mas toda regra teria de consultar duas tabelas.
+
+**Custo.** O visitante não vê a agenda sozinho e precisa perguntar. Pedidos para datas ocupadas chegam ao WhatsApp e exigem resposta do artista, o que é justamente a oportunidade de negociar.
+
