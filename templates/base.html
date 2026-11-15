@@ -1,11 +1,11 @@
-{% load tailwind_cli %}<!doctype html>
+{% load static tailwind_cli %}<!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{{ artist.name|default:"Site do artista" }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}{{ artist.headline }}{% endblock %}">
+  {% block meta %}{% include "partials/meta.html" %}{% endblock %}
   <meta name="theme-color" content="#17110d">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Inter+Tight:wght@400;500;600&amp;display=swap">

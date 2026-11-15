@@ -1,0 +1,23 @@
+{% load static %}
+{% comment %}
+  Título, descrição e prévias de compartilhamento (Google, WhatsApp, Instagram...).
+  Cada página inclui este parcial no bloco "meta", passando page_title e
+  page_description. Sem eles (página inicial), usa o nome e a frase do artista.
+{% endcomment %}
+{% firstof artist.name "Site do artista" as site_name %}
+<title>{% if page_title %}{{ page_title }} · {% endif %}{{ site_name }}</title>
+<meta name="description" content="{% firstof page_description artist.headline %}">
+<link rel="canonical" href="{{ canonical_url }}">
+
+{# Open Graph: a prévia que aparece ao colar o link no WhatsApp, Instagram, Facebook... #}
+<meta property="og:type" content="{% if page_title %}website{% else %}profile{% endif %}">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{% if page_title %}{{ page_title }} · {% endif %}{{ site_name }}">
+<meta property="og:description" content="{% firstof page_description artist.headline %}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:image" content="{{ og_image_url }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ site_name }}">
+<meta name="twitter:card" content="summary_large_image">

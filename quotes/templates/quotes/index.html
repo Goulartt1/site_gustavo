@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Pedir orçamento · {{ artist.name|default:"Artista" }}{% endblock %}
-{% block description %}Veja se a data do seu evento está livre e peça um orçamento a {{ artist.name|default:"o artista" }} pelo WhatsApp.{% endblock %}
+{% block meta %}{% include "partials/meta.html" with page_title="Pedir orçamento" page_description="Veja se a data do seu evento está livre e peça um orçamento pelo WhatsApp, com a mensagem pronta." %}{% endblock %}
 
 {% block head_scripts %}
   {# HTMX: atualiza a resposta enquanto a pessoa preenche. Sem ele, o formulário funciona do mesmo jeito. #}

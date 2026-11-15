@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Repertório · {{ artist.name|default:"Artista" }}{% endblock %}
-{% block description %}Músicas que {{ artist.name|default:"o artista" }} toca nos shows, por estilo. Sugira uma música para o repertório.{% endblock %}
+{% block meta %}{% include "partials/meta.html" with page_title="Repertório" page_description="As músicas dos shows, organizadas por estilo. Sugira uma música para o repertório." %}{% endblock %}
 
 {# A mensagem de "obrigado" aparece junto do formulário, não no topo da página. #}
 {% block messages %}{% endblock %}
