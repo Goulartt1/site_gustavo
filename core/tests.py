@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 
 from artist.models import ArtistProfile
+from core.client_ip import get_client_ip
 
 
 @pytest.fixture
@@ -78,3 +79,20 @@ def test_wrong_secret_is_refused(client, settings):
     response = client.get(reverse("core:home"), headers={"X-Origin-Secret": "chute"})
 
     assert response.status_code == 403
+
+
+# IP do visitante (core.client_ip.get_client_ip)
+
+
+def test_client_ip_ignores_forwarded_header_without_origin_secret(rf, settings):
+    settings.ORIGIN_SECRET = ""
+    request = rf.get("/", REMOTE_ADDR="10.0.0.1", HTTP_X_CLIENT_IP="1.2.3.4")
+
+    assert get_client_ip(request) == "10.0.0.1"
+
+
+def test_client_ip_uses_worker_header_with_origin_secret(rf, settings):
+    settings.ORIGIN_SECRET = "segredo-de-teste"
+    request = rf.get("/", REMOTE_ADDR="10.0.0.1", HTTP_X_CLIENT_IP="1.2.3.4")
+
+    assert get_client_ip(request) == "1.2.3.4"

@@ -281,3 +281,46 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *Load balancer do Google com Cloud Armor.* Proteção mais completa, mas custa por volta de US$ 18/mês só para existir.
 
 **Custo.** Configuração inicial maior (passos 6 e 10 do `docs/deploy.md`). Num ataque extremo, o site fica fora do ar até ser reaberto, o que é a troca escolhida: site fechado em vez de conta alta.
+
+---
+
+## 16. Repertório: app próprio, estilos editáveis e sugestões que só mudam de situação
+
+**Etapa:** 7 (Repertório) · **Data:** 2026-11-15
+
+**Contexto.** O site mostra as músicas que o artista toca e recebe sugestões dos visitantes. O material de divulgação lista seis estilos (gaúchas, sertanejo universitário, forró, pagode, modão e reggae), e a lista pode mudar.
+
+**Decisão.**
+- **App `repertoire`**, separado de `artist`: repertório é um assunto à parte.
+- **Estilo como tabela (`Style`)**, editável no Admin e criada já com os seis estilos (migração `0002_seed_styles`). A música aponta para o estilo com `on_delete=PROTECT`: não dá para apagar um estilo que ainda tem músicas.
+- **Situação da sugestão como lista fixa no código (`TextChoices`)**: pendente, aceita ou recusada. Quem decide essas opções é o sistema, não o artista.
+- **Aceitar só muda a situação** (`services.accept_suggestions`). "Aceitar" quer dizer "vou aprender"; o artista cadastra a música quando ela estiver pronta, e o site nunca anuncia o que ele ainda não toca.
+- As regras ficam em `repertoire/services.py`, para a API da fase 2 reaproveitar.
+
+**Alternativas.**
+- *Tudo no app `artist`.* Mais rápido agora, mas mistura responsabilidades.
+- *Estilo como `TextChoices`.* Mais simples, mas criar um estilo novo exigiria mudar o código e fazer deploy.
+- *Aceitar cria a música automaticamente.* Mais prático, mas a sugestão chega sem estilo e apareceria no site antes da hora.
+
+**Custo.** Uma tabela a mais e um passo a mais ao cadastrar música (escolher o estilo). O artista aceita a sugestão e depois cadastra a música à mão.
+
+---
+
+## 17. Proteção contra spam nos formulários públicos: campo-isca e limite por IP
+
+**Etapa:** 7 (Repertório) · **Data:** 2026-11-15
+
+**Contexto.** A sugestão de música é o primeiro formulário que qualquer visitante pode enviar. O CLAUDE.md exige proteção contra spam.
+
+**Decisão.** Duas defesas, sem serviço externo e sem clique extra para o visitante:
+1. **Campo-isca:** um campo `website` fora da tela e escondido de leitores de tela. Robôs costumam preencher tudo; se vier preenchido, o envio é descartado, mas a resposta é a mesma de sucesso, para o robô não descobrir o truque.
+2. **Limite por IP:** no máximo 5 sugestões por hora por endereço (`services.suggestion_limit_reached`). Passou disso, a página responde 429 (Too Many Requests). A contagem fica no cache em memória do Django, suficiente porque o Cloud Run roda uma cópia só do site (`--max-instances 1`); se o site reiniciar, a contagem zera, o que é aceitável.
+
+**De onde vem o IP.** Em produção, quem fala com o Django é o Worker do Cloudflare, então o endereço da conexão é o do Cloudflare. O Worker repassa o IP real no cabeçalho `X-Client-IP`, e o Django só confia nele quando `ORIGIN_SECRET` está definido, ou seja, quando o middleware já garantiu que a visita veio do Worker (`core/client_ip.py`).
+
+**Alternativas.**
+- *Captcha (Cloudflare Turnstile, reCAPTCHA).* Mais forte contra robôs sofisticados, mas exige conta e chaves, coloca um serviço externo na página e, no caso do reCAPTCHA, cookies de terceiros. Fica como reforço se aparecer spam de verdade.
+- *Limite guardado no banco ou no Redis.* Funciona com várias cópias do site, mas hoje há uma só; seria peça a mais sem necessidade.
+
+**Custo.** Robôs que respeitam o CSS (raros) passam pela isca; o limite segura o volume. Pessoas que compartilham o mesmo IP (uma empresa, uma rede de celular) dividem o limite de 5 por hora.
+

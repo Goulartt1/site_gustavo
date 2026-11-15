@@ -116,6 +116,8 @@ O banco novo começa vazio: o `migrate` cria as tabelas e o `createsuperuser` cr
 | `uv run python manage.py runserver` | Sobe o servidor de desenvolvimento em http://127.0.0.1:8000. Recarrega sozinho quando um arquivo muda. `Ctrl+C` para parar. |
 | `uv run python manage.py startapp accounts` | Cria a estrutura de um app novo (`models.py`, `admin.py`, `apps.py`, `tests.py`, `views.py`, `migrations/`). Depois, é preciso adicioná-lo em `INSTALLED_APPS`. |
 | `uv run python manage.py makemigrations` | Compara os modelos com as migrações existentes e gera um arquivo novo com a diferença. Não mexe no banco. Os arquivos gerados vão para o git. |
+| `uv run python manage.py makemigrations --check --dry-run` | Só confere se algum modelo mudou sem migração criada. `--dry-run` não grava nada; `--check` termina com erro se faltar migração. |
+| `uv run python manage.py showmigrations repertoire` | Lista as migrações do app `repertoire`, com `[X]` nas já aplicadas no banco. |
 | `uv run python manage.py migrate` | Aplica no banco as migrações ainda não aplicadas (cria e altera tabelas). |
 | `uv run python manage.py test` | Executor de testes do próprio Django. Desde a etapa 2, o projeto usa o `pytest` (ver abaixo). |
 | `uv run python manage.py createsuperuser` | Cria um usuário com acesso total ao Admin (http://127.0.0.1:8000/admin). Pede usuário, e-mail e senha. |
@@ -134,6 +136,7 @@ O banco novo começa vazio: o `migrate` cria as tabelas e o `createsuperuser` cr
 | `uv run pytest -v` | Lista cada teste pelo nome, com `PASSED` ou `FAILED`. |
 | `uv run pytest -k admin` | Roda só os testes cujo nome contém `admin`. |
 | `uv run pytest -x` | Para no primeiro teste que falhar. |
+| `uv run pytest repertoire -v` | Roda só os testes de uma pasta (aqui, o app `repertoire`). |
 
 Antes de abrir um pull request, rodar os três: `ruff check .`, `ruff format --check .` e `pytest`. São os mesmos passos do CI.
 

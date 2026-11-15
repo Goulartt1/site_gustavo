@@ -2,7 +2,8 @@
 //
 // Recebe as visitas de gustavolocks.com.br e repassa ao Cloud Run, enviando:
 // - X-Forwarded-Host: o domínio original (o Django usa para montar links);
-// - X-Origin-Secret: a "senha" que prova ao Django que a visita veio daqui.
+// - X-Origin-Secret: a "senha" que prova ao Django que a visita veio daqui;
+// - X-Client-IP: o IP do visitante (usado no limite de envios dos formulários).
 // Arquivos estáticos (CSS, fontes) ficam em cache no Cloudflare por 1 ano:
 // têm o hash do conteúdo no nome, então nunca ficam desatualizados.
 //
@@ -19,6 +20,8 @@ export default {
     proxied.headers.set("X-Forwarded-Host", incoming.host);
     proxied.headers.set("X-Forwarded-Proto", "https");
     proxied.headers.set("X-Origin-Secret", env.ORIGIN_SECRET);
+    // CF-Connecting-IP é preenchido pelo Cloudflare com o IP de quem visitou.
+    proxied.headers.set("X-Client-IP", request.headers.get("CF-Connecting-IP") || "");
 
     if (incoming.pathname.startsWith("/static/")) {
       return fetch(proxied, { cf: { cacheEverything: true, cacheTtl: 31536000 } });
