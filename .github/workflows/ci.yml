@@ -14,11 +14,30 @@ jobs:
     name: Lint, formatação e testes
     runs-on: ubuntu-latest
 
+    # Serviço: um PostgreSQL 18 rodando num contêiner ao lado do job, igual
+    # ao banco de produção. Existe só durante esta execução e some no fim.
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: site_gustavo
+          POSTGRES_PASSWORD: senha-usada-apenas-no-ci
+          POSTGRES_DB: site_gustavo
+        ports:
+          - 5432:5432
+        # Espera o banco aceitar conexões antes de começar os passos.
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       # Valores só para o CI: esta máquina roda testes e é descartada no fim,
-      # então a chave não precisa ser secreta (não é a de produção).
+      # então a chave e a senha não precisam ser secretas (não são as de produção).
       SECRET_KEY: chave-falsa-usada-apenas-no-ci
       DEBUG: "False"
+      DATABASE_URL: postgres://site_gustavo:senha-usada-apenas-no-ci@localhost:5432/site_gustavo
 
     steps:
       - name: Baixar o código
