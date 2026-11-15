@@ -177,3 +177,58 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 - *psycopg 3 sem `binary` (ou com `c`).* Exige ter a biblioteca do PostgreSQL (`libpq`) e ferramentas de compilação na máquina. Ganho de desempenho irrelevante para este projeto.
 
 **Custo.** Nenhum relevante. Se a hospedagem exigir, trocar o extra é uma linha no `pyproject.toml`.
+
+---
+
+## 11. Front-end do site público: templates do Django com Tailwind CSS v4
+
+**Etapa:** 4 (Template base e home) · **Data:** 2026-11-14
+
+**Contexto.** O design é o foco do projeto: o site precisa de um visual atual e marcante, sem perder o SEO dos templates do Django.
+
+**Decisão.**
+- Templates do Django continuam montando o HTML.
+- **Tailwind CSS v4** via `django-tailwind-cli`, que baixa o executável oficial do Tailwind (sem Node). Versão fixa em `TAILWIND_CLI_VERSION`. A identidade visual (cores, fontes, animações) fica no bloco `@theme` de `tailwind/source.css`, fora da pasta de estáticos.
+- O CSS final (`assets/css/tailwind.css`) é gerado (`tailwind build`) e não vai para o git; o deploy gera o dele.
+- Recursos modernos de CSS sem JavaScript: transição entre páginas (`@view-transition`), seções que aparecem ao rolar (`animation-timeline: view()`), animações respeitando `prefers-reduced-motion`.
+- **GSAP** e **HTMX + Alpine.js** entram quando houver uma necessidade concreta (animação especial, formulário de orçamento com resposta na hora).
+
+**Alternativas.**
+- *Front-end separado em Astro ou Next.js consumindo uma API.* Componentes e otimização de imagem melhores para quem desenvolve, mas o resultado visual é o mesmo (HTML, CSS e JS no navegador), e exigiria antecipar a API (fase 2), manter dois projetos e dois deploys.
+- *Pico.css.* Deixa o HTML apresentável sem esforço, mas não chega a um visual próprio.
+- *CSS escrito à mão.* Controle total, mas bem mais lento para chegar no mesmo resultado.
+- *Bootstrap.* Pesado e com cara de template.
+- *Tailwind via Node (npm).* Mesmo resultado, com uma ferramenta a mais no ambiente e no deploy.
+
+**Custo.** Um passo de build do CSS em desenvolvimento (`tailwind watch` ou `tailwind runserver`) e no deploy. As fontes vêm do Google Fonts por enquanto; avaliar hospedar as fontes no próprio site antes do lançamento (desempenho e privacidade).
+
+---
+
+## 12. Direção visual: A · Galpão
+
+**Etapa:** 4 (Template base e home) · **Data:** 2026-11-14
+
+**Contexto.** O artista toca música gaúcha e forró. Foram feitos três protótipos da página inicial para comparar.
+
+**Decisão.** Direção **A · Galpão**: rústico e elegante. Madeira escura (`#17110d`), creme (`#f3e9da`), caramelo (`#e3a75b`) e vermelho de couro (`#8e2b1f`); Fraunces (serifada, itálica nos destaques) nos títulos e Inter Tight no texto; bordas tracejadas que lembram o pesponto do couro; moldura em arco para a foto.
+
+**Alternativas.** *B · Arrasta-pé* (cores de chita, festivo, tipografia pesada) e *C · Pampa* (quase preto e dourado, editorial e cinematográfico). Protótipos: https://claude.ai/artifact/TTKrnBMkqGiVSDNSHGeeD6 (privado).
+
+**Custo.** O visual depende de boas fotos do artista em ambiente quente (palco, galpão). Sem elas, a moldura fica com o espaço reservado.
+
+---
+
+## 13. Perfil do artista como registro único editado no Admin
+
+**Etapa:** 4 (Template base e home) · **Data:** 2026-11-14
+
+**Contexto.** Nome, frases de apresentação, biografia, foto, WhatsApp e redes aparecem no site inteiro e precisam ser editados pelo artista, sem mexer em código.
+
+**Decisão.** Modelo `ArtistProfile` no app `artist`, com um único registro (`save()` sempre grava no `pk=1`; `ArtistProfile.load()` busca ou cria). No Admin, não dá para adicionar nem apagar, e a lista abre direto o formulário. Um *context processor* deixa o perfil e o link do WhatsApp disponíveis em todos os templates. Uma migração de dados cria o perfil com dados de exemplo. A regra do link do WhatsApp (`artist/whatsapp.py`) fica fora das views, para servir também à API na fase 2.
+
+**Alternativas.**
+- *Textos fixos nos templates.* Mais simples, mas o artista dependeria de um programador para trocar uma frase.
+- *Pacote django-solo.* Faz o registro único pronto, mas é uma dependência para algo que cabe em poucas linhas.
+- *Variáveis de ambiente.* São para configuração técnica, não para conteúdo editável.
+
+**Custo.** Uma consulta ao banco por página (o perfil). Irrelevante no volume deste site; se um dia pesar, dá para usar cache.

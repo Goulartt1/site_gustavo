@@ -46,8 +46,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Terceiros
+    "django_tailwind_cli",
     # Apps do projeto
     "accounts",
+    "artist",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -65,13 +69,16 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # Templates compartilhados pelo site inteiro (base.html e partes comuns).
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # Deixa o perfil do artista disponível em todos os templates.
+                "artist.context_processors.artist_profile",
             ],
         },
     },
@@ -132,6 +139,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+# Pasta de estáticos do projeto (CSS, JS, imagens fixas do site).
+STATICFILES_DIRS = [BASE_DIR / "assets"]
+
+# Tailwind CSS (via django-tailwind-cli, sem Node).
+# O arquivo de origem tem a identidade visual (@theme); o CSS final é gerado
+# em assets/css/tailwind.css por "manage.py tailwind build" (ou "watch").
+# Versão fixa para todo mundo (e o deploy) gerar exatamente o mesmo CSS.
+TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
+TAILWIND_CLI_VERSION = "4.3.5"
+
+# Arquivos enviados pelo Admin (ex.: foto do artista).
+# Em desenvolvimento ficam na pasta media/; em produção, o destino será
+# definido junto com a hospedagem (etapa 5).
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -14,3 +14,10 @@ wheels/
 
 # Banco SQLite local de desenvolvimento
 db.sqlite3
+
+# Tailwind: executável baixado e CSS gerado (refeitos por "manage.py tailwind build")
+.django_tailwind_cli/
+assets/css/tailwind.css
+
+# Arquivos enviados pelo Admin em desenvolvimento
+media/

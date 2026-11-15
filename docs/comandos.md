@@ -137,6 +137,22 @@ O banco novo começa vazio: o `migrate` cria as tabelas e o `createsuperuser` cr
 
 Antes de abrir um pull request, rodar os três: `ruff check .`, `ruff format --check .` e `pytest`. São os mesmos passos do CI.
 
+## Tailwind CSS (visual do site)
+
+O CSS do site é gerado a partir de `tailwind/source.css` e das classes usadas nos templates. Sem esse passo, o site abre sem estilo.
+
+| Comando | O que faz |
+| --- | --- |
+| `uv run python manage.py tailwind build` | Gera `assets/css/tailwind.css` uma vez, minificado. Na primeira vez, baixa o executável oficial do Tailwind para `.django_tailwind_cli/`. |
+| `uv run python manage.py tailwind watch` | Fica observando os templates e o `source.css` e regera o CSS a cada mudança. `Ctrl+C` para parar. |
+| `uv run python manage.py tailwind runserver` | Sobe o `runserver` e o `watch` juntos, num terminal só. É o jeito mais prático de trabalhar no visual. |
+
+## Admin e conteúdo
+
+| Comando | O que faz |
+| --- | --- |
+| http://127.0.0.1:8000/admin → Artista → Perfil do artista | Onde o artista edita nome, frases, biografia, foto, WhatsApp e redes. A foto enviada fica em `media/` (fora do git). |
+
 ## git
 
 | Comando | O que faz |

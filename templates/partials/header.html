@@ -1,0 +1,12 @@
+<header class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-5 px-6 py-7 sm:px-8">
+  <a href="{% url 'core:home' %}" class="font-display text-2xl font-semibold tracking-[0.14em] uppercase text-cream no-underline">{{ artist.name|default:"Artista" }}</a>
+
+  <nav aria-label="Principal" class="flex flex-wrap items-center gap-6 text-[15px]">
+    {% if artist.bio %}
+      <a href="{% url 'core:home' %}#sobre" class="text-cream/80 transition hover:text-caramel">Sobre</a>
+    {% endif %}
+    {% if whatsapp_link %}
+      <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-caramel px-5 font-semibold text-caramel transition hover:bg-caramel hover:text-wood-950">Pedir orçamento</a>
+    {% endif %}
+  </nav>
+</header>

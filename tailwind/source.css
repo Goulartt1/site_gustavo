@@ -1,0 +1,102 @@
+/*
+ * Identidade visual do site (direção A · Galpão).
+ * Fonte do Tailwind: "manage.py tailwind build" gera assets/css/tailwind.css.
+ */
+@import "tailwindcss";
+
+/* Onde o Tailwind procura classes usadas (caminhos relativos a este arquivo). */
+@source "../templates";
+@source "../*/templates";
+
+/* Cores e fontes da marca: viram classes como bg-wood-950, text-caramel, font-display. */
+@theme {
+  --color-wood-950: #17110d;
+  --color-wood-900: #211812;
+  --color-wood-800: #2a1e16;
+  --color-wood-700: #3a2a1e;
+  --color-cream: #f3e9da;
+  --color-sand: #d9cbb5;
+  --color-dust: #bfa98c;
+  --color-bark: #5a4636;
+  --color-caramel: #e3a75b;
+  --color-leather: #8e2b1f;
+  --color-mate: #2f7d4a;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-rise: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 32px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes marquee {
+    to {
+      translate: -50% 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-wood-950 font-sans text-cream antialiased;
+  }
+
+  ::selection {
+    @apply bg-caramel text-wood-950;
+  }
+}
+
+/* Borda tracejada que lembra o pesponto do couro. */
+@utility stitch {
+  border: 1.5px dashed color-mix(in oklab, var(--color-caramel) 55%, transparent);
+}
+
+/* Transição suave entre páginas do próprio site (navegadores que suportam). */
+@view-transition {
+  navigation: auto;
+}
+
+/* Seções aparecem ao rolar a página (CSS puro, sem JavaScript). */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 48px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 25%;
+  }
+}
+
+/* Quem pediu menos movimento no sistema não vê animações. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
