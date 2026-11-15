@@ -100,3 +100,27 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Campos dos formulários públicos (fundo creme). */
+@layer components {
+  .suggestion-form input[type="text"] {
+    @apply min-h-12 rounded-xl border-[1.5px] border-bark/40 bg-white/70 px-4 text-lg text-wood-950 transition outline-none focus:border-leather focus:ring-2 focus:ring-leather/30;
+  }
+
+  .suggestion-form input[type="checkbox"] {
+    @apply mt-0.5 size-5 shrink-0 accent-leather;
+  }
+
+  .suggestion-form [aria-invalid="true"] {
+    @apply border-leather;
+  }
+}
+
+/* Campo-isca dos formulários: fora da tela para pessoas, visível para robôs. */
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

@@ -17,6 +17,7 @@
   {% include "partials/header.html" %}
 
   <main id="conteudo">
+    {% block messages %}{% include "partials/messages.html" %}{% endblock %}
     {% block content %}{% endblock %}
   </main>
 

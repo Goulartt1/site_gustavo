@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Repertório · {{ artist.name|default:"Artista" }}{% endblock %}
+{% block description %}Músicas que {{ artist.name|default:"o artista" }} toca nos shows, por estilo. Sugira uma música para o repertório.{% endblock %}
+
+{# A mensagem de "obrigado" aparece junto do formulário, não no topo da página. #}
+{% block messages %}{% endblock %}
+
+{% block content %}
+  {# Abertura #}
+  <section class="mx-auto flex max-w-6xl flex-col gap-7 px-6 pt-8 pb-16 sm:px-8">
+    <p class="animate-rise text-sm tracking-[0.22em] uppercase text-caramel">Repertório</p>
+    <h1 class="animate-rise font-display text-[clamp(3.75rem,10vw,8rem)] leading-[0.9] font-light tracking-[-0.03em] italic [animation-delay:120ms]">Música para todos os momentos</h1>
+    <p class="animate-rise max-w-2xl text-xl leading-relaxed text-sand [animation-delay:240ms]">O repertório passeia por estilos diferentes e se adapta ao perfil do evento e do público. Não achou a sua? Sugira no fim da página.</p>
+
+    {% if styles %}
+      <nav aria-label="Estilos" class="animate-rise flex flex-wrap gap-3 pt-2 [animation-delay:360ms]">
+        {% for style in styles %}
+          <a href="#estilo-{{ style.pk }}" class="stitch inline-flex min-h-11 items-center rounded-full px-5 text-cream transition hover:bg-caramel hover:text-wood-950">{{ style.name }}</a>
+        {% endfor %}
+        <a href="#sugerir" class="inline-flex min-h-11 items-center rounded-full bg-caramel px-5 font-semibold text-wood-950 transition hover:-translate-y-0.5">Sugerir música</a>
+      </nav>
+    {% endif %}
+  </section>
+
+  {# Músicas por estilo #}
+  <div class="mx-auto flex max-w-6xl flex-col gap-20 px-6 pb-28 sm:px-8">
+    {% for style in styles %}
+      <section id="estilo-{{ style.pk }}" aria-labelledby="titulo-estilo-{{ style.pk }}" class="reveal scroll-mt-8 border-t-[1.5px] border-dashed border-caramel/40 pt-10">
+        <div class="flex flex-wrap items-baseline justify-between gap-4">
+          <h2 id="titulo-estilo-{{ style.pk }}" class="font-display text-5xl tracking-[-0.02em]">{{ style.name }}</h2>
+          <span class="text-sm tracking-[0.18em] uppercase text-dust">{{ style.active_songs|length }} música{{ style.active_songs|length|pluralize }}</span>
+        </div>
+        <ul class="mt-8 grid gap-x-12 gap-y-4 sm:grid-cols-2">
+          {% for song in style.active_songs %}
+            <li class="flex flex-col border-b border-cream/10 pb-4">
+              <span class="text-lg text-cream">{{ song.title }}</span>
+              {% if song.original_artist %}<span class="text-sm text-dust">{{ song.original_artist }}</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% empty %}
+      <p class="stitch rounded-2xl px-6 py-10 text-center text-lg text-sand">O repertório está sendo preparado. Enquanto isso, sugira uma música!</p>
+    {% endfor %}
+  </div>
+
+  {# Sugestão de música #}
+  <section id="sugerir" class="scroll-mt-8 bg-cream text-wood-950">
+    <div class="mx-auto grid max-w-6xl gap-12 px-6 py-24 sm:px-8 lg:grid-cols-[1fr_1.2fr]">
+      <div class="flex flex-col gap-5">
+        <p class="text-sm tracking-[0.22em] uppercase text-leather">Sugestão</p>
+        <h2 class="font-display text-6xl leading-none tracking-[-0.02em]">Sugira uma música</h2>
+        <p class="text-lg leading-relaxed text-bark">Tem uma música que não pode faltar no baile? Mande a sugestão. Ela não aparece no site na hora: o {{ artist.name|default:"artista" }} lê e decide se entra no repertório.</p>
+      </div>
+
+      <form method="post" action="{% url 'repertoire:index' %}#sugerir" class="suggestion-form flex flex-col gap-5" novalidate>
+        {% csrf_token %}
+
+        {% for message in messages %}
+          <p role="status" class="animate-rise rounded-2xl border-[1.5px] border-mate bg-mate/15 px-5 py-4 font-semibold text-wood-950">{{ message }}</p>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+          <div role="alert" class="rounded-2xl border-[1.5px] border-leather bg-leather/10 px-5 py-4 text-leather">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        {% for field in form %}
+          {% if field.name == "website" %}
+            {# Campo-isca: fora da tela e escondido de leitores de tela. #}
+            <div class="honeypot" aria-hidden="true">{{ field.label_tag }} {{ field }}</div>
+          {% elif field.name == "consent" %}
+            <div class="flex flex-col gap-1.5">
+              <label class="flex items-start gap-3 text-[15px] leading-snug text-bark">{{ field }} <span>{{ field.label }}</span></label>
+              {% for error in field.errors %}<p class="text-sm font-semibold text-leather">{{ error }}</p>{% endfor %}
+            </div>
+          {% else %}
+            <div class="flex flex-col gap-1.5">
+              <label for="{{ field.id_for_label }}" class="font-semibold">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}<p class="text-sm font-semibold text-leather">{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Enviar sugestão</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
