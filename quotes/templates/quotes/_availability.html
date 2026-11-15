@@ -1,0 +1,17 @@
+{% if availability == "free" %}
+  <div class="flex items-start gap-4">
+    <span aria-hidden="true" class="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full bg-mate text-white">✓</span>
+    <div>
+      <p class="font-display text-3xl">Ótimo, esse horário está livre!</p>
+      <p class="mt-1 text-sand">Mande o pedido para garantir a data.</p>
+    </div>
+  </div>
+{% else %}
+  <div class="flex items-start gap-4">
+    <span aria-hidden="true" class="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full bg-caramel text-wood-950">!</span>
+    <div>
+      <p class="font-display text-3xl">Esse horário está concorrido</p>
+      <p class="mt-1 text-sand">Fale com {{ artist.name|default:"o artista" }}: às vezes dá para encaixar, ajustar o horário ou combinar outra data.</p>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,35 @@
+{# Quadro da resposta: livre ou "a consultar" (nunca "ocupado", decisão 19). #}
+{% if result %}
+  <div class="flex flex-col gap-6 rounded-3xl bg-wood-950 p-7 text-cream">
+    {% include "quotes/_availability.html" with availability=result.availability %}
+
+    <div class="flex flex-col gap-2">
+      <p class="text-sm tracking-[0.18em] uppercase text-dust">Mensagem que vai para o WhatsApp</p>
+      <p class="rounded-2xl bg-wood-800 p-5 leading-relaxed whitespace-pre-line text-sand">{{ result.message }}</p>
+    </div>
+
+    {% if result.whatsapp_link %}
+      <a href="{{ result.whatsapp_link }}" target="_blank" rel="noopener" class="inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-mate px-7 text-lg font-semibold text-white transition hover:-translate-y-0.5">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.5.4-8.1-4.2-7.7-7.7L10 7.2l1 2z"/></svg>
+        Abrir o WhatsApp
+      </a>
+      <p class="text-sm text-dust">O WhatsApp abre com a mensagem pronta; é só tocar em enviar.</p>
+    {% else %}
+      <p class="rounded-2xl border-[1.5px] border-caramel/50 p-4 text-sand">O WhatsApp do artista ainda não foi cadastrado. Copie a mensagem acima e envie pelas redes sociais.</p>
+    {% endif %}
+  </div>
+{% elif availability %}
+  <div class="flex flex-col gap-4 rounded-3xl bg-wood-950 p-7 text-cream">
+    {% include "quotes/_availability.html" %}
+    <p class="text-sand">Complete os outros campos para montar a mensagem do WhatsApp.</p>
+  </div>
+{% elif availability_errors %}
+  <div role="alert" class="rounded-3xl border-[1.5px] border-leather bg-leather/10 p-7 text-leather">
+    {% for error in availability_errors %}<p class="font-semibold">{{ error }}</p>{% endfor %}
+  </div>
+{% else %}
+  <div class="stitch rounded-3xl p-7 text-bark">
+    <p class="font-display text-3xl text-wood-950">Disponibilidade</p>
+    <p class="mt-3 leading-relaxed">Escolha a data, o horário e a duração para ver se o horário está livre.</p>
+  </div>
+{% endif %}
