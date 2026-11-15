@@ -60,3 +60,7 @@ jobs:
 
       - name: Testes (pytest)
         run: uv run pytest
+
+      # Mesma checagem de segurança que o Django recomenda antes de publicar.
+      - name: Checagem de deploy (manage.py check --deploy)
+        run: uv run python manage.py check --deploy --fail-level WARNING
