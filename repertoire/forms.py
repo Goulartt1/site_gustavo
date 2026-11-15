@@ -1,18 +1,12 @@
 from django import forms
 
+from core.antispam import HoneypotForm
+
 from .models import SongSuggestion
 
 
-class SongSuggestionForm(forms.ModelForm):
-    """Formulário público "Sugira uma música"."""
-
-    # Campo-isca: escondido de pessoas (CSS e leitores de tela), mas robôs
-    # costumam preencher tudo. Se vier preenchido, a view descarta o envio.
-    website = forms.CharField(
-        required=False,
-        label="Deixe este campo vazio",
-        widget=forms.TextInput(attrs={"tabindex": "-1", "autocomplete": "off"}),
-    )
+class SongSuggestionForm(HoneypotForm, forms.ModelForm):
+    """Formulário público "Sugira uma música" (com campo-isca, ver core.antispam)."""
 
     consent = forms.BooleanField(
         required=False,
@@ -40,6 +34,3 @@ class SongSuggestionForm(forms.ModelForm):
                 "Para enviar com o seu nome, marque a autorização. Ou deixe o nome em branco.",
             )
         return cleaned
-
-    def is_spam(self):
-        return bool(self.cleaned_data.get("website"))
