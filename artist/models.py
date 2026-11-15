@@ -38,6 +38,14 @@ class ArtistProfile(models.Model):
     instagram_url = models.URLField("Instagram", blank=True)
     youtube_url = models.URLField("YouTube", blank=True)
     spotify_url = models.URLField("Spotify", blank=True)
+    min_gap_minutes = models.PositiveSmallIntegerField(
+        "intervalo mínimo entre shows (minutos)",
+        default=120,
+        help_text=(
+            "Tempo para desmontar, se deslocar e montar de novo. Um horário só é "
+            "considerado livre se houver essa folga antes e depois dos compromissos."
+        ),
+    )
 
     class Meta:
         verbose_name = "perfil do artista"
