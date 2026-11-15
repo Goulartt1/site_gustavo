@@ -1,6 +1,12 @@
+{% comment %}
+  Botão flutuante: atalho para conversar no WhatsApp em qualquer página.
+  A margem de baixo respeita a área segura do celular (barra de gestos do iPhone).
+{% endcomment %}
 {% if whatsapp_link %}
-  <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"
-     class="fixed right-6 bottom-6 z-40 flex size-15 items-center justify-center rounded-full bg-mate text-white shadow-[0_10px_30px_rgba(0,0,0,.45)] transition hover:scale-105">
-    <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.5.4-8.1-4.2-7.7-7.7L10 7.2l1 2z"/></svg>
+  <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" aria-label="Falar no WhatsApp" title="Falar no WhatsApp"
+     class="group fixed right-5 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-40 flex h-15 items-center gap-3 rounded-full bg-mate pr-[18px] pl-[18px] text-white shadow-[0_10px_30px_rgba(0,0,0,.45)] transition hover:scale-105 sm:right-6">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.5.4-8.1-4.2-7.7-7.7L10 7.2l1 2z"/></svg>
+    {# No computador, o texto aparece ao lado do ícone; no celular, só o ícone. #}
+    <span class="hidden font-semibold lg:inline">WhatsApp</span>
   </a>
 {% endif %}

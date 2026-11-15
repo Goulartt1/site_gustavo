@@ -109,12 +109,12 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 8. Depoimentos com aprovação (candidata a ser feita pelo dono do projeto, com revisão)
 9. Agenda interna por horário (sem calendário público)
 10. Pedido de orçamento que abre o WhatsApp
-11. Redes, botão flutuante e SEO básico
+11. Redes, botão flutuante e SEO básico (meta tags, prévia de compartilhamento, JSON-LD, robots.txt, sitemap)
 
 ## Pendências
 - Nome, estilos, WhatsApp e Instagram recebidos (ver seção O artista); faltam a cidade exata e a área de atendimento, nome do "Novo Projeto" (se houver), canal do YouTube e a lista real de músicas
 - Fotos e vídeos reais
-- Visual: direção A · Galpão definida (cores, fontes, estilo); faltam o arquivo do logotipo (se houver) e fotos reais; as fotos do material podem servir de provisórias, se o artista autorizar
+- Visual: direção A · Galpão definida (cores, fontes, estilo); faltam o arquivo do logotipo (se houver) e fotos reais (a imagem de compartilhamento assets/img/og-default.png é provisória); as fotos do material podem servir de provisórias, se o artista autorizar
 - Contas de produção a criar pelo dono do projeto (Registro.br, Cloudflare, Neon, Google Cloud): passo a passo em `docs/deploy.md`
 
 ## Regras de segurança e privacidade

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
     # Terceiros
     "django_tailwind_cli",
     # Apps do projeto
@@ -99,6 +100,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 # Deixa o perfil do artista disponível em todos os templates.
                 "artist.context_processors.artist_profile",
+                # Endereço canônico e imagem de compartilhamento (meta tags).
+                "core.context_processors.seo",
             ],
         },
     },

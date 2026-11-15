@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from django.core.cache import cache
 from django.urls import reverse
@@ -120,3 +122,95 @@ def test_rate_limit_counts_per_scope_and_ip(empty_cache):
     assert limit.reached("1.1.1.1")
     assert not limit.reached("2.2.2.2")
     assert not RateLimit("outro", limit=2, window=60).reached("1.1.1.1")
+
+
+# SEO: meta tags, prévias de compartilhamento, robots.txt e sitemap
+
+
+@pytest.mark.django_db
+def test_home_has_title_description_canonical_and_open_graph(client, profile):
+    profile.headline = "Frase de apresentação de teste."
+    profile.save()
+
+    html = client.get(reverse("core:home"), {"utm_source": "teste"}).content.decode()
+
+    assert f"<title>{profile.name}</title>" in html
+    assert '<meta name="description" content="Frase de apresentação de teste.">' in html
+    # Canônico e og:url sem os parâmetros (?utm_source=...).
+    assert '<link rel="canonical" href="http://testserver/">' in html
+    assert '<meta property="og:url" content="http://testserver/">' in html
+    assert 'property="og:image" content="http://testserver/static/img/og-default.png"' in html
+    assert 'rel="icon" href="/static/img/favicon.svg"' in html
+
+
+@pytest.mark.django_db
+def test_each_page_has_its_own_title_and_description(client):
+    pages = {
+        "repertoire:index": "Repertório · ",
+        "testimonials:index": "Depoimentos · ",
+        "quotes:index": "Pedir orçamento · ",
+    }
+    for name, title_start in pages.items():
+        html = client.get(reverse(name)).content.decode()
+        assert f"<title>{title_start}" in html, name
+        assert f'<link rel="canonical" href="http://testserver{reverse(name)}">' in html
+        assert html.count("<title>") == 1
+
+
+@pytest.mark.django_db
+def test_home_has_structured_data_with_social_profiles(client, profile):
+    profile.instagram_url = "https://www.instagram.com/exemplo/"
+    profile.city = "Florianópolis · SC"
+    profile.save()
+
+    html = client.get(reverse("core:home")).content.decode()
+    raw = html.split('<script type="application/ld+json">')[1].split("</script>")[0]
+    data = json.loads(raw)
+
+    assert data["@type"] == "MusicGroup"
+    assert data["name"] == profile.name
+    assert data["sameAs"] == ["https://www.instagram.com/exemplo/"]
+    assert data["location"]["name"] == "Florianópolis · SC"
+    assert "Forró" in data["genre"]
+
+
+@pytest.mark.django_db
+def test_structured_data_cannot_close_the_script_tag(client, profile):
+    profile.headline = "</script><script>alert(1)</script>"
+    profile.save()
+
+    html = client.get(reverse("core:home")).content.decode()
+    block = html.split('<script type="application/ld+json">')[1].split("</script>")[0]
+
+    assert r"\u003C/script\u003E" in block
+    assert json.loads(block)["description"] == profile.headline  # o JSON continua válido
+
+
+@pytest.mark.django_db
+def test_robots_txt_blocks_admin_and_points_to_sitemap(client):
+    response = client.get("/robots.txt")
+    text = response.content.decode()
+
+    assert response["Content-Type"].startswith("text/plain")
+    assert "Disallow: /admin/" in text
+    assert "Sitemap: http://testserver/sitemap.xml" in text
+
+
+@pytest.mark.django_db
+def test_sitemap_lists_public_pages(client):
+    xml = client.get("/sitemap.xml").content.decode()
+
+    for path in ["/", "/orcamento/", "/repertorio/", "/depoimentos/"]:
+        assert f"<loc>http://testserver{path}</loc>" in xml
+    assert "/admin/" not in xml
+
+
+def test_footer_links_social_profiles_with_rel_me(client, profile):
+    profile.instagram_url = "https://www.instagram.com/exemplo/"
+    profile.whatsapp = "5548999990000"
+    profile.save()
+
+    html = client.get(reverse("core:home")).content.decode()
+
+    assert 'href="https://www.instagram.com/exemplo/" target="_blank" rel="me noopener"' in html
+    assert 'aria-label="WhatsApp"' in html

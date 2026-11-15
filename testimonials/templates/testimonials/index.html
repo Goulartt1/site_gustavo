@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Depoimentos · {{ artist.name|default:"Artista" }}{% endblock %}
-{% block description %}O que dizem de quem já contratou {{ artist.name|default:"o artista" }}. Deixe também o seu depoimento.{% endblock %}
+{% block meta %}{% include "partials/meta.html" with page_title="Depoimentos" page_description="O que dizem casamentos, aniversários, bailes e bares que já tiveram o show. Deixe também o seu depoimento." %}{% endblock %}
 
 {# A mensagem de "obrigado" aparece junto do formulário, não no topo da página. #}
 {% block messages %}{% endblock %}
