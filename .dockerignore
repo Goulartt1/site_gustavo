@@ -1,0 +1,19 @@
+# O que NÃO entra na imagem do site.
+.git/
+.github/
+.claude/
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[oc]
+.pytest_cache/
+.ruff_cache/
+.django_tailwind_cli/
+assets/css/tailwind.css
+staticfiles/
+media/
+db.sqlite3
+docs/
+infra/
