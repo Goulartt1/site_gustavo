@@ -54,36 +54,10 @@
         <p class="text-lg leading-relaxed text-bark">Tem uma música que não pode faltar no baile? Mande a sugestão. Ela não aparece no site na hora: o {{ artist.name|default:"artista" }} lê e decide se entra no repertório.</p>
       </div>
 
-      <form method="post" action="{% url 'repertoire:index' %}#sugerir" class="suggestion-form flex flex-col gap-5" novalidate>
+      <form method="post" action="{% url 'repertoire:index' %}#sugerir" class="public-form flex flex-col gap-5" novalidate>
         {% csrf_token %}
 
-        {% for message in messages %}
-          <p role="status" class="animate-rise rounded-2xl border-[1.5px] border-mate bg-mate/15 px-5 py-4 font-semibold text-wood-950">{{ message }}</p>
-        {% endfor %}
-
-        {% if form.non_field_errors %}
-          <div role="alert" class="rounded-2xl border-[1.5px] border-leather bg-leather/10 px-5 py-4 text-leather">
-            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-          </div>
-        {% endif %}
-
-        {% for field in form %}
-          {% if field.name == "website" %}
-            {# Campo-isca: fora da tela e escondido de leitores de tela. #}
-            <div class="honeypot" aria-hidden="true">{{ field.label_tag }} {{ field }}</div>
-          {% elif field.name == "consent" %}
-            <div class="flex flex-col gap-1.5">
-              <label class="flex items-start gap-3 text-[15px] leading-snug text-bark">{{ field }} <span>{{ field.label }}</span></label>
-              {% for error in field.errors %}<p class="text-sm font-semibold text-leather">{{ error }}</p>{% endfor %}
-            </div>
-          {% else %}
-            <div class="flex flex-col gap-1.5">
-              <label for="{{ field.id_for_label }}" class="font-semibold">{{ field.label }}</label>
-              {{ field }}
-              {% for error in field.errors %}<p class="text-sm font-semibold text-leather">{{ error }}</p>{% endfor %}
-            </div>
-          {% endif %}
-        {% endfor %}
+        {% include "partials/public_form_fields.html" %}
 
         <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Enviar sugestão</button>
       </form>

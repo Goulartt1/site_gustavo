@@ -103,15 +103,26 @@
 
 /* Campos dos formulários públicos (fundo creme). */
 @layer components {
-  .suggestion-form input[type="text"] {
+  /* min-w-0: dentro do grid, o formulário pode encolher até a largura da tela. */
+  .public-form {
+    @apply min-w-0;
+  }
+
+  .public-form input[type="text"],
+  .public-form textarea {
     @apply min-h-12 rounded-xl border-[1.5px] border-bark/40 bg-white/70 px-4 text-lg text-wood-950 transition outline-none focus:border-leather focus:ring-2 focus:ring-leather/30;
   }
 
-  .suggestion-form input[type="checkbox"] {
+  /* Sem w-full, a caixa de texto tem largura mínima de ~40 letras e vaza no celular. */
+  .public-form textarea {
+    @apply w-full py-3 leading-relaxed;
+  }
+
+  .public-form input[type="checkbox"] {
     @apply mt-0.5 size-5 shrink-0 accent-leather;
   }
 
-  .suggestion-form [aria-invalid="true"] {
+  .public-form [aria-invalid="true"] {
     @apply border-leather;
   }
 }
