@@ -48,3 +48,33 @@ def test_about_section_only_appears_with_bio(client, profile):
     html = client.get(reverse("core:home")).content.decode()
     assert 'id="sobre"' in html
     assert "Texto de teste da biografia." in html
+
+
+# Porta de entrada só pelo Cloudflare (core.middleware.RequireOriginSecretMiddleware)
+
+
+@pytest.mark.django_db
+def test_direct_access_is_refused_when_origin_secret_is_set(client, settings):
+    settings.ORIGIN_SECRET = "segredo-de-teste"
+
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_access_through_worker_is_allowed(client, settings):
+    settings.ORIGIN_SECRET = "segredo-de-teste"
+
+    response = client.get(reverse("core:home"), headers={"X-Origin-Secret": "segredo-de-teste"})
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_wrong_secret_is_refused(client, settings):
+    settings.ORIGIN_SECRET = "segredo-de-teste"
+
+    response = client.get(reverse("core:home"), headers={"X-Origin-Secret": "chute"})
+
+    assert response.status_code == 403
