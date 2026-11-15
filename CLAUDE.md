@@ -97,7 +97,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 11. Redes, botão flutuante e SEO básico
 
 ## Pendências
-- Nome artístico, estilo musical, cidade, número do WhatsApp e redes sociais (usar dados de exemplo até lá)
+- Nome artístico (Gustavo Locks) e estilo (música gaúcha e forró) definidos; faltam cidade, número do WhatsApp e redes sociais (usar dados de exemplo até lá)
 - Fotos e vídeos reais
 - Visual: direção A · Galpão definida (cores, fontes, estilo); faltam logotipo (se houver) e fotos reais
 - Hospedagem

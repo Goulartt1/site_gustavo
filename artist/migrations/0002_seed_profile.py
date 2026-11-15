@@ -6,7 +6,7 @@ O artista substitui tudo pelo Admin. Se o perfil já existir, nada muda.
 from django.db import migrations
 
 EXAMPLE = {
-    "name": "Gustavo",
+    "name": "Gustavo Locks",
     "tagline": "Música gaúcha · Forró · Bailes e eventos",
     "headline": (
         "Do galpão ao salão: vanerão, chamamé, xote e baião tocados ao vivo, "
