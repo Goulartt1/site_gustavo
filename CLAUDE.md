@@ -12,7 +12,8 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Linguagem: Python 3.13
 - Back-end: Django 5.2 (LTS, suporte até abril de 2028); Django REST Framework a partir da fase 2
 - Banco: PostgreSQL (SQLite aceitável só no início do desenvolvimento local)
-- Site público: templates Django (por causa do SEO)
+- Site público: templates Django (por causa do SEO), com Tailwind CSS v4 via django-tailwind-cli (sem Node), recursos modernos de CSS (view transitions, animações na rolagem) e, quando houver necessidade concreta, GSAP e HTMX + Alpine.js
+- Design é foco do projeto: visual atual e marcante. Direção visual escolhida: A · Galpão (ver `docs/decisoes.md`, decisão 12)
 - Painel do artista: Django Admin na fase 1; React (Vite) consumindo a API DRF na fase 3
 - Qualidade: ruff (lint e formatação) e pytest-django; GitHub Actions rodando os dois a cada push
 - Métricas: analytics sem cookies e agregado (ex.: Umami ou Cloudflare Web Analytics)
@@ -98,7 +99,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 ## Pendências
 - Nome artístico, estilo musical, cidade, número do WhatsApp e redes sociais (usar dados de exemplo até lá)
 - Fotos e vídeos reais
-- Visual do site (identidade, cores, fontes)
+- Visual: direção A · Galpão definida (cores, fontes, estilo); faltam logotipo (se houver) e fotos reais
 - Hospedagem
 
 ## Regras de segurança e privacidade
