@@ -1,0 +1,21 @@
+{# Formulário + quadro da resposta. Volta inteiro quando o formulário é enviado. #}
+<div id="orcamento-bloco" class="grid gap-12 lg:grid-cols-[1.1fr_1fr]">
+  <form method="post" action="{% url 'quotes:index' %}" class="public-form flex flex-col gap-5" novalidate
+        hx-post="{% url 'quotes:index' %}" hx-target="#orcamento-bloco" hx-swap="outerHTML">
+    {% csrf_token %}
+
+    {# A cada mudança, pede só a resposta (live=1), sem redesenhar os campos. #}
+    <div class="flex flex-col gap-5"
+         hx-post="{% url 'quotes:index' %}" hx-trigger="change, input changed delay:700ms"
+         hx-include="closest form" hx-vals='{"live": "1"}' hx-target="#resultado" hx-swap="innerHTML">
+      {% include "partials/public_form_fields.html" %}
+    </div>
+
+    <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Ver disponibilidade e mensagem</button>
+    <p class="text-sm text-bark">Nada do que você preencher fica guardado no site: vai direto para o WhatsApp.</p>
+  </form>
+
+  <div id="resultado" aria-live="polite" class="lg:sticky lg:top-8 lg:self-start">
+    {% include "quotes/_result.html" %}
+  </div>
+</div>

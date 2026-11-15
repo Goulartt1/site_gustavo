@@ -150,6 +150,13 @@ O CSS do site é gerado a partir de `tailwind/source.css` e das classes usadas n
 | `uv run python manage.py tailwind watch` | Fica observando os templates e o `source.css` e regera o CSS a cada mudança. `Ctrl+C` para parar. |
 | `uv run python manage.py tailwind runserver` | Sobe o `runserver` e o `watch` juntos, num terminal só. É o jeito mais prático de trabalhar no visual. |
 
+## Baixar arquivos (curl)
+
+| Comando | O que faz |
+| --- | --- |
+| `curl -sSfL -o assets/js/htmx.min.js https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js` | Baixa o HTMX para dentro do projeto. `-o` diz onde salvar; `-L` segue redirecionamentos; `-f` falha (em vez de salvar a página de erro) se o endereço não existir; `-sS` esconde a barra de progresso, mas mostra erros. A versão (`@2.0.4`) fica no endereço, então todo mundo baixa o mesmo arquivo. |
+| `Get-FileHash assets/js/htmx.min.js` | (PowerShell) Mostra a impressão digital (SHA-256) do arquivo. Serve para conferir que é o mesmo arquivo de outra máquina. |
+
 ## Admin e conteúdo
 
 | Comando | O que faz |

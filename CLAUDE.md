@@ -12,7 +12,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Linguagem: Python 3.13
 - Back-end: Django 5.2 (LTS, suporte até abril de 2028); Django REST Framework a partir da fase 2
 - Banco: PostgreSQL (SQLite aceitável só no início do desenvolvimento local)
-- Site público: templates Django (por causa do SEO), com Tailwind CSS v4 via django-tailwind-cli (sem Node), recursos modernos de CSS (view transitions, animações na rolagem) e, quando houver necessidade concreta, GSAP e HTMX + Alpine.js
+- Site público: templates Django (por causa do SEO), com Tailwind CSS v4 via django-tailwind-cli (sem Node), recursos modernos de CSS (view transitions, animações na rolagem) HTMX (desde a etapa 10, no pedido de orçamento, servido pelo próprio site em assets/js) e, quando houver necessidade concreta, GSAP e Alpine.js
 - Design é foco do projeto: visual atual e marcante. Direção visual escolhida: A · Galpão (ver `docs/decisoes.md`, decisão 12)
 - Painel do artista: Django Admin na fase 1; React (Vite) consumindo a API DRF na fase 3
 - Qualidade: ruff (lint e formatação) e pytest-django; GitHub Actions rodando os dois a cada push
@@ -55,7 +55,7 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Repertório
 - Ler depoimentos aprovados e enviar depoimento (fica pendente de aprovação)
 - Sugerir música para o repertório
-- Pedido de orçamento: data, endereço, horário de início e duração (e tipo de evento) → responde "livre" ou "a consultar", nunca "ocupado" → abre o WhatsApp nos dois casos com mensagem pronta. SEM preço no site. O pedido NÃO é salvo no banco; só o clique no WhatsApp é contado (ver seção Pedidos de orçamento).
+- Pedido de orçamento: tipo de evento, data, horário de início, duração e cidade/bairro ou local (sem endereço completo) → responde "livre" ou "a consultar", nunca "ocupado" → abre o WhatsApp nos dois casos com mensagem pronta. SEM preço no site. O pedido NÃO é salvo no banco; a contagem de cliques no WhatsApp fica para o analytics da fase 4 (ver seção Pedidos de orçamento).
 - Sem calendário público por enquanto: a disponibilidade só aparece no pedido de orçamento (decisão 19)
 - Links para Instagram, YouTube e outras redes; botão flutuante do WhatsApp
 
@@ -78,6 +78,9 @@ Projeto de portfólio e de aprendizado: o dono do projeto é dev iniciante (Pyth
 - Não são salvos no banco. O site monta a mensagem e abre o WhatsApp; a negociação e o histórico ficam no WhatsApp.
 - Considerado e descartado: salvar histórico de pedidos. O site não sabe se a mensagem foi enviada nem se o show aconteceu, então o histórico não seria confiável e ainda guardaria dado pessoal (LGPD).
 - Pode ser revisto se o artista sentir falta; é uma decisão barata de mudar depois.
+- A disponibilidade aparece enquanto a pessoa preenche (HTMX). Sem JavaScript, o mesmo formulário funciona em dois passos (decisão 20).
+- Dados do pedido nunca vão na URL do nosso servidor (os logs do Cloud Run guardam as URLs): o formulário usa POST e o botão leva direto ao wa.me.
+- Contagem (cliques, procura por data) adiada para o analytics da fase 4.
 
 ## Modelos iniciais (proposta, revisar antes de implementar)
 - User: usuário customizado, criado no início do projeto

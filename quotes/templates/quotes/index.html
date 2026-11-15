@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedir orçamento · {{ artist.name|default:"Artista" }}{% endblock %}
+{% block description %}Veja se a data do seu evento está livre e peça um orçamento a {{ artist.name|default:"o artista" }} pelo WhatsApp.{% endblock %}
+
+{% block head_scripts %}
+  {# HTMX: atualiza a resposta enquanto a pessoa preenche. Sem ele, o formulário funciona do mesmo jeito. #}
+  <script src="{% static 'js/htmx.min.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+  <section class="mx-auto flex max-w-6xl flex-col gap-7 px-6 pt-8 pb-16 sm:px-8">
+    <p class="animate-rise text-sm tracking-[0.22em] uppercase text-caramel">Orçamento</p>
+    <h1 class="animate-rise font-display text-[clamp(3.75rem,10vw,8rem)] leading-[0.9] font-light tracking-[-0.03em] italic [animation-delay:120ms]">Vamos fazer seu evento acontecer?</h1>
+    <p class="animate-rise max-w-2xl text-xl leading-relaxed text-sand [animation-delay:240ms]">Conte a data, o horário e o tipo de evento. Você já vê se o horário está livre e manda o pedido pronto pelo WhatsApp.</p>
+  </section>
+
+  <section class="bg-cream text-wood-950">
+    <div class="mx-auto max-w-6xl px-6 py-20 sm:px-8">
+      {% include "quotes/_block.html" %}
+    </div>
+  </section>
+{% endblock %}

@@ -369,3 +369,28 @@ Decisões podem ser revistas: quando isso acontecer, a entrada antiga fica e gan
 
 **Custo.** O visitante não vê a agenda sozinho e precisa perguntar. Pedidos para datas ocupadas chegam ao WhatsApp e exigem resposta do artista, o que é justamente a oportunidade de negociar.
 
+---
+
+## 20. Pedido de orçamento: resposta ao vivo com HTMX, funcionando também sem JavaScript
+
+**Etapa:** 10 (Pedido de orçamento) · **Data:** 2026-11-15
+
+**Contexto.** O visitante informa tipo de evento, data, horário, duração e local; o site responde "livre" ou "a consultar" (decisão 19) e abre o WhatsApp com a mensagem pronta. Nada é salvo.
+
+**Decisão.**
+- **Resposta ao vivo com HTMX** (escolha do dono do projeto, para agregar valor à entrega): assim que data, horário e duração estão preenchidos, o quadro ao lado já mostra a disponibilidade, sem recarregar a página; com todos os campos, aparece a prévia da mensagem e o botão do WhatsApp. Só o quadro é trocado, então quem está digitando não perde o foco.
+- **Melhoria progressiva:** é o mesmo formulário e a mesma view. Sem JavaScript (ou se o HTMX falhar), o envio recarrega a página com a resposta. A view sabe o que devolver pelo cabeçalho `HX-Request` e pelo campo `live`.
+- **HTMX servido pelo próprio site** (`assets/js/htmx.min.js`, versão 2.0.4 fixa), carregado só na página de orçamento. O navegador do visitante não faz pedido a terceiros.
+- **Privacidade:** pede cidade e bairro (ou o nome do local), não o endereço completo. Os dados vão por POST (fora dos logs do Cloud Run) e o botão leva direto ao `wa.me`.
+- **Sem anti-spam neste formulário:** ele não salva nem envia nada; um robô não tem o que ganhar. O limite do Cloudflare segura excesso de acessos.
+- **Sem contagem por enquanto:** cliques e procura por data ficam para o analytics da fase 4.
+- **Botões "Pedir orçamento"** (cabeçalho e página inicial) levam ao formulário; o botão flutuante continua abrindo o WhatsApp direto, para quem só quer conversar.
+- Regras em `quotes/services.py` (`check_availability`, `build_message`, `check_quote`), reaproveitando `agenda.services.is_available`.
+
+**Alternativas.**
+- *Dois passos sem JavaScript.* Mais simples e já funciona (é o modo reserva), mas a resposta só aparece depois de enviar.
+- *Contar os pedidos verificados agora.* Daria um termômetro de procura imediato, mas seria um modelo a mais antes da ferramenta de métricas.
+- *HTMX por CDN.* Menos arquivos no projeto, mas cada visita avisaria um servidor de terceiros.
+
+**Custo.** Primeira biblioteca JavaScript do projeto (50 KB, só nesta página) e três templates parciais (`_block`, `_result`, `_availability`). A view atende três tipos de requisição, o que exige testes para cada um.
+
