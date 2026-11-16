@@ -11,11 +11,11 @@
       {% include "partials/public_form_fields.html" %}
     </div>
 
-    <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Ver disponibilidade e mensagem</button>
+    <button type="submit" class="mt-2 inline-flex min-h-13 items-center justify-center self-start rounded-full bg-leather px-8 text-lg font-semibold text-cream transition hover:-translate-y-0.5">Conferir e ver a mensagem</button>
     <p class="text-sm text-bark">Nada do que você preencher fica guardado no site: vai direto para o WhatsApp.</p>
   </form>
 
-  <div id="resultado" aria-live="polite" class="lg:sticky lg:top-8 lg:self-start">
+  <div id="resultado" aria-live="polite" class="scroll-mt-6 lg:sticky lg:top-8 lg:self-start">
     {% include "quotes/_result.html" %}
   </div>
 </div>
