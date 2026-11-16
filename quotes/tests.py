@@ -244,6 +244,19 @@ def test_htmx_submit_returns_form_and_result_block(client, profile, next_month):
     assert "Este campo é obrigatório" in response.content.decode()
 
 
+def test_htmx_submit_scrolls_to_result_when_valid(client, profile, next_month):
+    response = client.post(URL, data(next_month), **HTMX)
+
+    assert response["HX-Reswap"] == "outerHTML show:#resultado:top"
+
+
+def test_htmx_submit_scrolls_to_first_error_when_invalid(client, profile, next_month):
+    response = client.post(URL, data(next_month, place=""), **HTMX)
+
+    assert response["HX-Reswap"] == "outerHTML show:[data-field-error]:top"
+    assert "data-field-error" in response.content.decode()
+
+
 # Botões de orçamento
 
 

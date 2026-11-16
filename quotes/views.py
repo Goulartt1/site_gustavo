@@ -24,7 +24,13 @@ def quote(request):
     if request.headers.get("HX-Request") == "true":
         if request.POST.get("live") == "1":
             return render(request, "quotes/_result.html", context)
-        return render(request, "quotes/_block.html", context)
+        response = render(request, "quotes/_block.html", context)
+        # Depois de trocar o bloco, rola a página até onde a pessoa precisa olhar:
+        # o primeiro campo com erro ou, se está tudo certo, o quadro da resposta.
+        # No celular, o quadro fica embaixo do formulário, fora da vista.
+        target = "[data-field-error]" if form.errors else "#resultado"
+        response["HX-Reswap"] = f"outerHTML show:{target}:top"
+        return response
     return render(request, "quotes/index.html", context)
 
 
